@@ -5,6 +5,7 @@ import java.io.FileNotFoundException;
 public class Main {
 
     public static void main(String[] args) {
+        // TODO: Convert this to double [][]
 //        InputReader inputReader = new InputReader();
 //        try {
 //            // Reading input csv
