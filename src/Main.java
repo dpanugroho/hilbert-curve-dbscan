@@ -1,5 +1,6 @@
 import util.InputReader;
 import core.DBScan;
+
 import java.io.FileNotFoundException;
 
 public class Main {
@@ -18,14 +19,14 @@ public class Main {
         double[][] sampleDataset = new double[100][5];
         for (int i = 0; i < sampleDataset.length; i++) {
             for (int j = 0; j < sampleDataset[i].length; j++) {
-                sampleDataset[i][j] = Math.random()*10;
+                sampleDataset[i][j] = Math.random() * 10;
             }
         }
 
         // TODO: Verify the correctness of this clustering result
         DBScan mDBScan = new DBScan(sampleDataset, 4, 5);
         int[] labels = mDBScan.Scan();
-        for(int i=0; i<labels.length; i++){
+        for (int i = 0; i < labels.length; i++) {
             System.out.println(labels[i]);
         }
     }

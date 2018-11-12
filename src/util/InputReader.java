@@ -9,18 +9,19 @@ public class InputReader {
 
     public InputReader() {
     }
+
     public String[][] readCsv(String path) throws FileNotFoundException {
         ArrayList<ArrayList<String>> dataFrame = new ArrayList<>();
 
         Scanner rowScanner = new Scanner(new File(path));
         rowScanner.useDelimiter("\n");
-        while(rowScanner.hasNext()){
+        while (rowScanner.hasNext()) {
             Scanner colScanner = new Scanner(rowScanner.next());
             colScanner.useDelimiter(",");
 
             ArrayList<String> currentRow = new ArrayList<>();
 
-            while(colScanner.hasNext()){
+            while (colScanner.hasNext()) {
                 currentRow.add(colScanner.next());
             }
             dataFrame.add(currentRow);
