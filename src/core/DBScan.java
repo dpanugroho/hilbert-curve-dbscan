@@ -6,13 +6,14 @@ import java.util.ArrayList;
 public class DBScan {
     double[][] D;
     int[] labels;
+    boolean[] visited;
     double eps;
     int minPts;
 
     public DBScan(double[][] D, double eps, int minPts) {
-        // Initialize labels
         this.D = D;
         this.labels = new int[D.length];
+        this.visited = new boolean[D.length];
         this.eps = eps;
         this.minPts = minPts;
     }
@@ -40,14 +41,13 @@ public class DBScan {
         // Go through all points in dataset
         for (int p = 0; p < this.D.length; p++) {
             // 0: not visited yet, -1: doesn't belong to any cluster, other: belong to the specified cluster
-            if (this.labels[p] == 0) {
-                ArrayList<Integer> neighborPts = regionQuery(p);
-                //System.out.println(neighborPts.size());
+            if (!this.visited[p]) {
+                ArrayList<Integer> neighborPts = regionQuery(p, this.eps);
                 if (neighborPts.size() < this.minPts) {
-                    this.labels[p] = -1; // this point doesn't have enough neighbor to be considered a cluster
+                    this.visited[p] = true;
                 } else {
                     c++; // change to the next cluster
-                    expandCluster(c, p, neighborPts);
+                    neighborPts.addAll(expandCluster(p, neighborPts, c, this.eps, this.minPts));
                 }
             }
         }
@@ -56,30 +56,32 @@ public class DBScan {
 
     /**
      * From current cluster, expand cluster with neighbor points
-     * @param c cluster id
      * @param p a point
      * @param neighborPts neighbor points of p
+     * @param c cluster id
+     * @param eps epsion value
+     * @param minPts minimum number of neighbors for a point to be considered as a cluster
      */
-    private void expandCluster(int c, int p, ArrayList<Integer> neighborPts) {
-        this.labels[p] = c; // mark p as visited and add p to cluster c
+    private ArrayList<Integer> expandCluster(int p, ArrayList<Integer> neighborPts, int c, double eps, double minPts) {
+        this.visited[p] = true; // mark p as visited
+        this.labels[p] = c; // add p to cluster c
 
         for (int i = 0; i < neighborPts.size(); i++) {
             int Pn = neighborPts.get(i);
 
-            // add P' to cluster c is it's not member of any cluster yet
-            if (this.labels[Pn] == -1) {
-                labels[Pn] = c; // mark P' as visited and add to cluster c
-            } else if (this.labels[Pn] == 0) {
-                this.labels[Pn] = c; // mark P' as visited and add to cluster c
-
-                ArrayList<Integer> PnNeighborPts = regionQuery(Pn);
-
-                if (PnNeighborPts.size() >= this.minPts) {
-                    // TODO: clarify with dpanugroho what he is trying to do
+            if (!this.visited[Pn]) {
+                this.visited[Pn] = true; // mark P' as visited
+                ArrayList<Integer> PnNeighborPts = regionQuery(Pn, eps);
+                if (PnNeighborPts.size() >= minPts) {
                     neighborPts.addAll(PnNeighborPts);
                 }
             }
+            if (this.labels[Pn] < 1) { // if P' is not yet member of any cluster
+                this.labels[Pn] = c; // add P' to cluster c
+            }
         }
+
+        return neighborPts;
     }
 
     /**
@@ -88,12 +90,11 @@ public class DBScan {
      * @param P index of core point
      * @return
      */
-    private ArrayList<Integer> regionQuery(int P) {
+    private ArrayList<Integer> regionQuery(int P, double eps) {
         ArrayList<Integer> neighbors = new ArrayList<>();
 
         for (int i = 0; i < this.D.length; i++) {
-            //System.out.println(l2(this.D[P], this.D[i]));
-            if (l2(this.D[P], this.D[i]) < this.eps) {
+            if (l2(this.D[P], this.D[i]) < eps) {
                 neighbors.add(i);
             }
         }
