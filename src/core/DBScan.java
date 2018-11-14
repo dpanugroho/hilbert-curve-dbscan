@@ -18,18 +18,6 @@ public class DBScan {
         this.minPts = minPts;
     }
 
-    // TODO: Write docs
-    private static double l2(double[] source, double[] target) {
-        // TODO: Check to make sure source and target has the same dimension
-
-        // Calculate the distance
-        float tmp = 0;
-        for (int i = 0; i < source.length; i++) {
-            tmp += Math.pow((source[i] - target[i]), 2);
-        }
-        return Math.sqrt(tmp);
-    }
-
     /**
      * Main DBScan process, iterating through all points in dataset
      * @return labels for each points
@@ -94,7 +82,7 @@ public class DBScan {
         ArrayList<Integer> neighbors = new ArrayList<>();
 
         for (int i = 0; i < this.D.length; i++) {
-            if (l2(this.D[P], this.D[i]) < eps) {
+            if (Distance.getL2Distance(this.D[P], this.D[i]) < eps) {
                 neighbors.add(i);
             }
         }
