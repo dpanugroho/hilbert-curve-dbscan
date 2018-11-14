@@ -20,6 +20,7 @@ public class DBScan {
 
     /**
      * Main DBScan process, iterating through all points in dataset
+     *
      * @return labels for each points
      */
     public int[] Scan() {
@@ -44,11 +45,12 @@ public class DBScan {
 
     /**
      * From current cluster, expand cluster with neighbor points
-     * @param p a point
+     *
+     * @param p           a point
      * @param neighborPts neighbor points of p
-     * @param c cluster id
-     * @param eps epsion value
-     * @param minPts minimum number of neighbors for a point to be considered as a cluster
+     * @param c           cluster id
+     * @param eps         epsion value
+     * @param minPts      minimum number of neighbors for a point to be considered as a cluster
      */
     private ArrayList<Integer> expandCluster(int p, ArrayList<Integer> neighborPts, int c, double eps, double minPts) {
         this.visited[p] = true; // mark p as visited

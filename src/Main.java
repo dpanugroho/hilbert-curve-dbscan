@@ -31,14 +31,12 @@ public class Main {
         // Pam mPam = new Pam(dataFrameInDouble, 5);
         // int[] labels = mPam.fit(100);
 
-        Clarans mClara = new Clarans(dataFrameInDouble,5,3,30);
+        Clarans mClara = new Clarans(dataFrameInDouble, 5, 3, 30);
         int[] labels = mClara.fit(100);
 
         for (int i = 0; i < labels.length; i++) {
             System.out.println(i + 1 + "\t\t" + labels[i]);
         }
-
-
 
 
     }
