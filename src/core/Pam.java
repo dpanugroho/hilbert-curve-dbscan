@@ -3,7 +3,7 @@ import java.util.concurrent.ThreadLocalRandom;
 
 /**
  * Implementation of Partition Around Medoid (PAM)
- *
+ * Maybe we can add variable to store usedMedoid to avoid infinite loop
  *
  *
  */
@@ -18,7 +18,7 @@ public class Pam {
 
     }
 
-    private double getCost(int[] labels){
+    public double getCost(int[] labels){
         // for each cluster label in [0..k]
         double totalCost = 0;
         for (int i=0;i<labels.length;i++) {
@@ -64,6 +64,7 @@ public class Pam {
 
         int counter = 0;
         while (counter < maxIter){
+            // call assign() again to get new assignment with different medoid
             int[] modifiedLabel = this.assign();
             double modifiedCost = this.getCost(modifiedLabel);
 

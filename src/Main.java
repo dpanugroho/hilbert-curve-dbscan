@@ -1,3 +1,4 @@
+import core.Clarans;
 import core.Pam;
 import util.InputReader;
 import core.DBScan;
@@ -27,8 +28,11 @@ public class Main {
         //DBScan mDBScan = new DBScan(dataFrameInDouble, 0.5, 5);
         //int[] labels = mDBScan.Scan();
 
-        Pam mPam = new Pam(dataFrameInDouble, 5);
-        int[] labels = mPam.fit(100);
+        // Pam mPam = new Pam(dataFrameInDouble, 5);
+        // int[] labels = mPam.fit(100);
+
+        Clarans mClara = new Clarans(dataFrameInDouble,5,3,30);
+        int[] labels = mClara.fit(100);
 
         for (int i = 0; i < labels.length; i++) {
             System.out.println(i + 1 + "\t\t" + labels[i]);
