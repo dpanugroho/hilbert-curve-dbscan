@@ -8,6 +8,8 @@ import java.io.FileNotFoundException;
 public class Main {
 
     public static void main(String[] args) {
+        long startTime = System.nanoTime();
+
         double[][] dataFrameInDouble = new double[0][];
         InputReader inputReader = new InputReader();
         try {
@@ -32,12 +34,13 @@ public class Main {
         // int[] labels = mPam.fit(100);
 
         Clarans mClara = new Clarans(dataFrameInDouble, 5, 3, 30);
-        int[] labels = mClara.fit(100);
+        Integer[] labels = mClara.fit(100, true);
 
         for (int i = 0; i < labels.length; i++) {
             System.out.println(i + 1 + "\t\t" + labels[i]);
         }
 
-
+        long elapsedTime = (System.nanoTime() - startTime);
+        System.out.println("Elapsed time: " + String.valueOf(elapsedTime));
     }
 }

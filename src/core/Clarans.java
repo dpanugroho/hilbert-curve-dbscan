@@ -1,5 +1,6 @@
 package core;
 
+import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class Clarans {
@@ -24,21 +25,36 @@ public class Clarans {
         return sample;
     }
 
-    // Parallelization can be done here
-    public int[] fit(int maxIter) {
-        Pam mPam = new Pam(this.dataset, this.k);
-        int[] bestLabel = new int[dataset.length];
+    public Integer[] fit(int maxIter, boolean parallelize) {
+        Pam mPam = new Pam(sample(), this.k);
+        Integer[] bestLabel = new Integer[dataset.length];
         double minCost = Double.POSITIVE_INFINITY;
-        for (int i = 0; i < n_sample; i++) {
-            int[] currentLabel = mPam.fit(maxIter);
-            double currentCost = mPam.getCost(currentLabel);
-            if (currentCost < minCost) {
-                bestLabel = currentLabel;
-                minCost = currentCost;
+
+        if (parallelize) {
+            List<Integer[]> labels = new ArrayList<>();
+            List<Double> costs = new ArrayList<>();
+
+            Arrays.asList(n_sample).parallelStream().forEach((sample) -> {
+                Integer[] currentLabel = mPam.fit(maxIter);
+                double currentCost = mPam.getCost(currentLabel);
+
+                labels.add(currentLabel);
+                costs.add(currentCost);
+            });
+
+            int bestLabelIndex = costs.indexOf(Collections.min(costs));
+            bestLabel = labels.get(bestLabelIndex);
+        } else {
+            for (int i = 0; i < n_sample; i++) {
+                Integer[] currentLabel = mPam.fit(maxIter);
+                double currentCost = mPam.getCost(currentLabel);
+                if (currentCost < minCost) {
+                    bestLabel = currentLabel;
+                    minCost = currentCost;
+                }
             }
         }
+
         return bestLabel;
     }
-
-
 }

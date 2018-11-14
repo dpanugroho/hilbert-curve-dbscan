@@ -17,7 +17,7 @@ public class Pam {
 
     }
 
-    public double getCost(int[] labels) {
+    public double getCost(Integer[] labels) {
         // for each cluster label in [0..k]
         double totalCost = 0;
         for (int i = 0; i < labels.length; i++) {
@@ -26,8 +26,8 @@ public class Pam {
         return totalCost;
     }
 
-    private int[] assign() {
-        int[] labels = new int[dataset.length];
+    private Integer[] assign() {
+        Integer[] labels = new Integer[dataset.length];
 
         // Initialize random index to pick initial random medoid from dataset
         int[] randomMedoidIndex = new int[this.k];
@@ -56,15 +56,15 @@ public class Pam {
         return labels;
     }
 
-    public int[] fit(int maxIter) {
+    public Integer[] fit(int maxIter) {
         // after all points assigned, we can get the current total cost of the current cluster label assignment
-        int[] currentLabel = this.assign();
+        Integer[] currentLabel = this.assign();
         double currentCost = this.getCost(currentLabel);
 
         int counter = 0;
         while (counter < maxIter) {
             // call assign() again to get new assignment with different medoid
-            int[] modifiedLabel = this.assign();
+            Integer[] modifiedLabel = this.assign();
             double modifiedCost = this.getCost(modifiedLabel);
 
             if (modifiedCost < currentCost) {
