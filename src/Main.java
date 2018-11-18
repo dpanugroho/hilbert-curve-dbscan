@@ -2,6 +2,8 @@ import core.Clarans;
 import core.Pam;
 import util.InputReader;
 import core.DBScan;
+import hilbert.HilbertCurve;
+import hilbert.HilbertProcess;
 
 import java.io.FileNotFoundException;
 
@@ -26,6 +28,11 @@ public class Main {
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
+        
+        //HilbertProcess hilbertProcess = new HilbertProcess();
+        //Integer[] numOfCellPoints = {0,4,2,1,0,1,0,0,0,1,1,0,0,1,4};
+        //System.out.println(hilbertProcess.clusterAdjacentCell(numOfCellPoints));
+        //System.out.println(hilbertProcess.getMedoidPointList(hilbertProcess.clusterAdjacentCell(numOfCellPoints)));
 
         //DBScan mDBScan = new DBScan(dataFrameInDouble, 0.5, 5);
         //int[] labels = mDBScan.Scan();
