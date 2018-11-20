@@ -79,8 +79,6 @@ public class Main {
         
         HilbertProcess hilbertProcess = new HilbertProcess();
         
-        List<Integer> listInteger = new ArrayList<Integer>();
-        
         //Find Hilbert index
         for (int i = 0; i < dataFrameInDouble.length; i++) {
         	long[] coordinates= new long[dataFrameInDouble[0].length];
@@ -91,28 +89,20 @@ public class Main {
             System.out.println(i);
             index = hilbertProcess.mapCoordinatesToIndex(coordinates, bits, dimensions);
             System.out.println("index="+index);
-            //createHilbertDistanceList
-            int[] array = hilbertProcess.createHilbertDistanceList(index,hilbertDistance);
-            
-            for (int j = 0; j < array.length; j++) {
-            	listInteger.add(array[j]);
-            }
-            
-            
-            //System.out.println("hilbertDistance "+hilbertDistance[183]);
+            hilbertProcess.createHilbertDistanceList(index,hilbertDistance);
         }
         
-//        hilbertProcess.clusterAdjacentCell(listInteger)
+        Integer[] numberOfCellPoints = new Integer[hilbertDistance.length];
+        for (int j = 0; j < hilbertDistance.length; j++) {
+        	numberOfCellPoints[j] = hilbertDistance[j];
+        }
+     
+        //System.out.println(numberOfCellPoints);
+        //System.out.println(hilbertProcess.clusterAdjacentCell(numberOfCellPoints));
+        System.out.println(hilbertProcess.getMedoidPointList(hilbertProcess.clusterAdjacentCell(numberOfCellPoints)));
         
-        Integer[] numberOfCellPoints = new Integer[listInteger.size()];
-        numberOfCellPoints = listInteger.toArray(numberOfCellPoints);
-        List<List<Integer>> clusterAdjacentList = hilbertProcess.clusterAdjacentCell(numberOfCellPoints);
-        
-        List<List<Long>> result = hilbertProcess.getMedoidPointList(clusterAdjacentList);
-        System.out.println(result);
-        
-        //Integer[] numOfCellPoints = {0,4,2,1,0,1,0,0,0,1,1,0,0,1,4};
-        //System.out.println(hilbertProcess.clusterAdjacentCell(numOfCellPoints));
+//        Integer[] numOfCellPoints = {0,4,2,1,0,1,0,0,0,1,1,0,0,1,4};
+//        System.out.println(hilbertProcess.clusterAdjacentCell(numOfCellPoints));
 //        System.out.println(hilbertProcess.getMedoidPointList(hilbertProcess.clusterAdjacentCell(numOfCellPoints)));
 
         //DBScan mDBScan = new DBScan(dataFrameInDouble, 0.5, 5);
