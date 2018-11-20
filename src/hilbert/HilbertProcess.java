@@ -5,13 +5,14 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
 public class HilbertProcess {
 	
 	int threshold = 3;
-	int bits = 4;
+	int bits = 2;
 	int dimensions = 4;
 	
 	int numOfClusterPoint = 0;
@@ -74,7 +75,7 @@ public class HilbertProcess {
 		  return dest;
 	}
 	
-	public ArrayList<List<Long>> getMedoidPointList(ArrayList<List<Integer>> cluster){		
+	public ArrayList<List<Long>> getMedoidPointList(List<List<Integer>> cluster){		
 		for (int i=0 ; i < cluster.size() ; i++) {
 			//num of points in the cluster is odd
 			if(cluster.get(i).size() % 2 != 0) {
@@ -98,5 +99,15 @@ public class HilbertProcess {
 		
 		return medoidPointList;
 	}
-	
+	public static BigInteger mapCoordinatesToIndex(long[] coordinates, int bits, int dimensions) {
+		HilbertCurve c = HilbertCurve.bits(bits).dimensions(dimensions);
+		BigInteger index = c.index(coordinates);
+		return index;
+	}
+	public static int[] createHilbertDistanceList(BigInteger index, int[] hilbertDistance) {
+		//System.out.println(index.intValue());
+		//System.out.println(hilbertDistance.length);
+		hilbertDistance[index.intValue()] +=1;
+		return hilbertDistance;
+	}
 }
