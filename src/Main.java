@@ -19,6 +19,7 @@ public class Main {
         double[][] testNormalized = new double[0][];
         int bits = 2;
         int dimensions = 4;
+        int threshold = 3;
         int[] hilbertDistance = new int[(int) Math.pow(Math.pow(2, bits), dimensions)];
         int[] indexOfCoordinates = new int[(int) Math.pow(Math.pow(2, bits), dimensions)];
 
@@ -84,7 +85,7 @@ public class Main {
                 coordinates[j] = dataFrameHilbert[i][j];
             }
             System.out.println("i=" + i);
-            index = hilbertProcess.mapCoordinatesToIndex(coordinates, bits, dimensions);
+            index = hilbertProcess.mapCoordinatesToIndex(coordinates);
             indexOfCoordinates[index.intValue()] = i;
             System.out.println(index.intValue() + " indexOfCoordinates" + indexOfCoordinates[index.intValue()]);
             hilbertProcess.createHilbertDistanceList(index, hilbertDistance);
