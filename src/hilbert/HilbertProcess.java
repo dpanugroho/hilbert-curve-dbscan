@@ -62,11 +62,10 @@ public class HilbertProcess {
 
 
 
-    public List<List<Long>> getMedoidPointList(List<List<Integer>> clusters) {
-        List<List<Long>> medoidPoints = new ArrayList<>();
-        for (List<Integer> cluster : clusters) {
-            List<Long> points = new ArrayList<>();
-
+    public List<Integer> getMedoidPointIndexList(List<List<Integer>> clusters, int[] hbIndexMapOriginDataIndex) {
+        List<Integer> medoidPointsIndexList = new ArrayList<>();
+        
+        for (List<Integer> cluster : clusters) {      	
             int medoidIndex;
             //num of points in the cluster is odd
             if (cluster.size() % 2 != 0) {
@@ -74,14 +73,10 @@ public class HilbertProcess {
             } else { //num of points in the cluster is even
                 medoidIndex = (cluster.size() / 2) - 1;
             }
-
-            for (int i = 0; i < dimensions; i++) {
-                points.add(hc.point((long) cluster.get(medoidIndex))[i]);
-            }
-            medoidPoints.add(points);
+            medoidPointsIndexList.add(hbIndexMapOriginDataIndex[(int)cluster.get(medoidIndex)]);
         }
-
-        return medoidPoints;
+        
+        return medoidPointsIndexList;
     }
 
     public BigInteger mapCoordinatesToIndex(long[] coordinates) {
