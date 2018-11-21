@@ -1,29 +1,24 @@
 import core.Clarans;
-import core.Pam;
 import util.InputReader;
 import util.MathUtil;
-import core.DBScan;
-import hilbert.HilbertCurve;
 import hilbert.HilbertProcess;
 
 import java.io.FileNotFoundException;
 import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 public class Main {
 
     public static void main(String[] args) {
         long startTime = System.nanoTime();
-       
+
         double[][] dataFrameInDouble = new double[0][];
-        long[][] dataFrameHilbert = new long[0][]; 
-        double[][] testNormalized = new double[0][]; 
+        long[][] dataFrameHilbert = new long[0][];
+        double[][] testNormalized = new double[0][];
         int bits = 2;
         int dimensions = 4;
-        int[] hilbertDistance = new int[(int)Math.pow(Math.pow(2,bits),dimensions)];
-        
+        int threshold = 3;
+        int[] hilbertDistance = new int[(int) Math.pow(Math.pow(2, bits), dimensions)];
+
         InputReader inputReader = new InputReader();
         try {
             // Reading input csv
@@ -39,29 +34,29 @@ public class Main {
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
-        
+
         System.out.println(dataFrameInDouble[0].length); //4D
         System.out.println(dataFrameInDouble.length); //150
-        
-		testNormalized = new double[dataFrameInDouble.length][dataFrameInDouble[0].length];
-		dataFrameHilbert = new long[dataFrameInDouble.length][dataFrameInDouble[0].length];
+
+        testNormalized = new double[dataFrameInDouble.length][dataFrameInDouble[0].length];
+        dataFrameHilbert = new long[dataFrameInDouble.length][dataFrameInDouble[0].length];
         //normalize data,get coordinate,get Hilbert index
-        for(int j = 0; j < dataFrameInDouble[0].length; j++) {
-        	Double[] column = new Double[dataFrameInDouble.length];
-        	for(int i=0; i<dataFrameInDouble.length;i++) {
-        		column[i]=dataFrameInDouble[i][j];     		
-        	}
-        	//normalize
-        	double[] normalizedData = MathUtil.normalize(column).clone();
+        for (int j = 0; j < dataFrameInDouble[0].length; j++) {
+            Double[] column = new Double[dataFrameInDouble.length];
+            for (int i = 0; i < dataFrameInDouble.length; i++) {
+                column[i] = dataFrameInDouble[i][j];
+            }
+            //normalize
+            double[] normalizedData = MathUtil.normalize(column).clone();
             //getHilbertCoordinate
-            long[] HilbertCoordinate = MathUtil.getHilbertCoordinate(normalizedData,bits).clone();
-            for(int i=0;i<dataFrameInDouble.length;i++) {
-        		testNormalized[i][j] = normalizedData[i] ;
-        		dataFrameHilbert[i][j] = HilbertCoordinate[i] ;
-    		}     	
+            long[] HilbertCoordinate = MathUtil.getHilbertCoordinate(normalizedData, bits).clone();
+            for (int i = 0; i < dataFrameInDouble.length; i++) {
+                testNormalized[i][j] = normalizedData[i];
+                dataFrameHilbert[i][j] = HilbertCoordinate[i];
+            }
         }
-        
-        
+
+
         System.out.println("-----------------------normalized----------------------------------");
         for (int i = 0; i < dataFrameInDouble.length; i++) {
             for (int j = 0; j < dataFrameInDouble[0].length; j++) {
@@ -76,31 +71,31 @@ public class Main {
             }
             System.out.println();
         }
-        
-        HilbertProcess hilbertProcess = new HilbertProcess();
-        
+
+        HilbertProcess hilbertProcess = new HilbertProcess(bits, dimensions, threshold);
+
         //Find Hilbert index
         for (int i = 0; i < dataFrameInDouble.length; i++) {
-        	long[] coordinates= new long[dataFrameInDouble[0].length];
-        	BigInteger index = BigInteger.valueOf(0);
-            for (int j = 0; j < dataFrameInDouble[0].length; j++) {       	
-            	coordinates[j] = dataFrameHilbert[i][j];       	
+            long[] coordinates = new long[dataFrameInDouble[0].length];
+            BigInteger index = BigInteger.valueOf(0);
+            for (int j = 0; j < dataFrameInDouble[0].length; j++) {
+                coordinates[j] = dataFrameHilbert[i][j];
             }
             System.out.println(i);
-            index = hilbertProcess.mapCoordinatesToIndex(coordinates, bits, dimensions);
-            System.out.println("index="+index);
-            hilbertProcess.createHilbertDistanceList(index,hilbertDistance);
+            index = hilbertProcess.mapCoordinatesToIndex(coordinates);
+            System.out.println("index=" + index);
+            hilbertProcess.createHilbertDistanceList(index, hilbertDistance);
         }
-        
+
         Integer[] numberOfCellPoints = new Integer[hilbertDistance.length];
         for (int j = 0; j < hilbertDistance.length; j++) {
-        	numberOfCellPoints[j] = hilbertDistance[j];
+            numberOfCellPoints[j] = hilbertDistance[j];
         }
-     
+
         //System.out.println(numberOfCellPoints);
         //System.out.println(hilbertProcess.clusterAdjacentCell(numberOfCellPoints));
         System.out.println(hilbertProcess.getMedoidPointList(hilbertProcess.clusterAdjacentCell(numberOfCellPoints)));
-        
+
 //        Integer[] numOfCellPoints = {0,4,2,1,0,1,0,0,0,1,1,0,0,1,4};
 //        System.out.println(hilbertProcess.clusterAdjacentCell(numOfCellPoints));
 //        System.out.println(hilbertProcess.getMedoidPointList(hilbertProcess.clusterAdjacentCell(numOfCellPoints)));
