@@ -1,7 +1,10 @@
 package util;
 
+import core.Distance;
+
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 
 public class MathUtil {
     /**
@@ -24,6 +27,14 @@ public class MathUtil {
             coordinates[i] = (long) Math.ceil(normalizedDataPoints[i] * (double) hilbertSize);
         }
         return coordinates;
+    }
+
+    public static double L2Cost(double[][] dataset, double[] currentRandomNeighbor) {
+        double totalCost = 0;
+        for(int i = 0; i < currentRandomNeighbor.length; i++){
+            totalCost += Distance.getL2Distance(dataset[i], currentRandomNeighbor);
+        }
+        return totalCost;
     }
 }
 
