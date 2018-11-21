@@ -1,3 +1,4 @@
+import core.Clara;
 import core.Clarans;
 import util.InputReader;
 import util.MathUtil;
@@ -85,7 +86,7 @@ public class Main {
                 coordinates[j] = dataFrameHilbert[i][j];
             }
             System.out.println("i=" + i);
-            index = hilbertProcess.mapCoordinatesToIndex(coordinates);
+            //index = hilbertProcess.mapCoordinatesToIndex(coordinates);
             indexOfCoordinates[index.intValue()] = i;
             System.out.println(index.intValue() + " indexOfCoordinates" + indexOfCoordinates[index.intValue()]);
             hilbertProcess.createHilbertDistanceList(index, hilbertDistance);
@@ -97,7 +98,7 @@ public class Main {
         }
 
         //System.out.println(numberOfCellPoints);
-        System.out.println(hilbertProcess.clusterAdjacentCell(numberOfCellPoints));
+        //System.out.println(hilbertProcess.clusterAdjacentCell(numberOfCellPoints));
         //System.out.println(hilbertProcess.getMedoidPointList(hilbertProcess.clusterAdjacentCell(numberOfCellPoints)));
         
 //        Integer[] numOfCellPoints = {0,4,2,1,0,1,0,0,0,1,1,0,0,1,4};
