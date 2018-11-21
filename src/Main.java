@@ -93,9 +93,9 @@ public class Main {
         }
 
         //System.out.println(numberOfCellPoints);
-        //System.out.println(hilbertProcess.clusterAdjacentCell(numberOfCellPoints));
-        System.out.println(hilbertProcess.getMedoidPointList(hilbertProcess.clusterAdjacentCell(numberOfCellPoints)));
-
+        System.out.println(hilbertProcess.clusterAdjacentCell(numberOfCellPoints));
+        //System.out.println(hilbertProcess.getMedoidPointList(hilbertProcess.clusterAdjacentCell(numberOfCellPoints)));
+        
 //        Integer[] numOfCellPoints = {0,4,2,1,0,1,0,0,0,1,1,0,0,1,4};
 //        System.out.println(hilbertProcess.clusterAdjacentCell(numOfCellPoints));
 //        System.out.println(hilbertProcess.getMedoidPointList(hilbertProcess.clusterAdjacentCell(numOfCellPoints)));
@@ -106,7 +106,7 @@ public class Main {
         // Pam mPam = new Pam(dataFrameInDouble, 5);
         // int[] labels = mPam.fit(100);
 
-        Clarans mClara = new Clarans(dataFrameInDouble, 5, 3, 30);
+        Clara mClara = new Clara(dataFrameInDouble, 5, 3, 30);
         Integer[] labels = mClara.fit(100, true);
 
         for (int i = 0; i < labels.length; i++) {

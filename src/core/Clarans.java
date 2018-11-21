@@ -1,60 +1,66 @@
 package core;
 
-import java.util.*;
-import java.util.concurrent.ThreadLocalRandom;
+import util.MathUtil;
+
+import java.util.List;
+import java.util.Random;
 
 public class Clarans {
-    double[][] dataset;
-    int k;
-    int n_sample;
-    int sample_size;
+    private double[][] dataset;
+    private int maxNeighborToCheck;
+    private List<List<Integer>> initialMedoid;
+    private Integer[] labels;
 
-    public Clarans(double[][] dataset, int k, int n_sample, int sample_size) {
+    public Clarans(double[][] dataset, int maxNeighborToCheck, List<List<Integer>> initialMedoid) {
         this.dataset = dataset;
-        this.k = k;
-        this.n_sample = n_sample;
-        this.sample_size = sample_size;
+        this.maxNeighborToCheck = maxNeighborToCheck;
+        this.initialMedoid = initialMedoid;
+
+        this.labels = new Integer[dataset.length];
     }
 
-    private double[][] sample() {
-        double[][] sample = new double[sample_size][this.dataset[0].length];
-        int[] sample_index = new int[sample_size];
-        for (int i = 0; i < sample_size; i++) {
-            sample[i] = dataset[ThreadLocalRandom.current().nextInt(0, dataset.length)];
-        }
-        return sample;
-    }
+//    public Integer[] assign(int maxIter){
+//        int iterCount = 0;
+//        int checkedNeighbor = 0;
+//
+//        double bestCost = MathUtil.L2Cost(this.dataset, initialMedoid);
+//        List<List<Integer>> bestMedoid = initialMedoid;
+//        // initially assign all point in dataset to this initial cluster
+//        while (iterCount < maxIter){
+//            while (checkedNeighbor < maxNeighborToCheck){
+//                List<List<Integer>> currentRandomNeighbor = this.getRandomNeighbor();
+//                double currentCost = MathUtil.L2Cost(this.dataset, currentRandomNeighbor);
+//                if (currentCost < bestCost){
+//                    bestMedoid = currentRandomNeighbor;
+//                    bestCost = currentCost;
+//                }
+//                checkedNeighbor++;
+//            }
+//            iterCount++;
+//        }
+//
+//        // Assign all data in the dataset with the best medoid
+//        double minCost = Double.POSITIVE_INFINITY;
+//        for(int i = 0; i < dataset.length; i++){
+//            for(int j = 0; j<bestMedoid.size(); j++){
+//                double currentCost = Distance.getL2Distance(dataset[i], dataset[bestMedoid[j]]);
+//                if (currentCost < minCost){
+//                    minCost = currentCost;
+//                    this.labels[i]=bestMedoid[j];
+//                }
+//            }
+//        }
+//    }
 
-    public Integer[] fit(int maxIter, boolean parallelize) {
-        Pam mPam = new Pam(sample(), this.k);
-        Integer[] bestLabel = new Integer[dataset.length];
-        double minCost = Double.POSITIVE_INFINITY;
-
-        if (parallelize) {
-            List<Integer[]> labels = new ArrayList<>();
-            List<Double> costs = new ArrayList<>();
-
-            Arrays.asList(n_sample).parallelStream().forEach((sample) -> {
-                Integer[] currentLabel = mPam.fit(maxIter);
-                double currentCost = mPam.getCost(currentLabel);
-
-                labels.add(currentLabel);
-                costs.add(currentCost);
-            });
-
-            int bestLabelIndex = costs.indexOf(Collections.min(costs));
-            bestLabel = labels.get(bestLabelIndex);
-        } else {
-            for (int i = 0; i < n_sample; i++) {
-                Integer[] currentLabel = mPam.fit(maxIter);
-                double currentCost = mPam.getCost(currentLabel);
-                if (currentCost < minCost) {
-                    bestLabel = currentLabel;
-                    minCost = currentCost;
-                }
-            }
-        }
-
-        return bestLabel;
-    }
+//    private List<List<Integer>> getRandomNeighbor(List<List<Integer>> bestMedoid) {
+//        List<List<Integer>> neighbor = bestMedoid;
+//        Random r = new Random();
+//        int indexToReplace = r.nextInt(neighbor.size());
+//
+//        // TODO: The substitute should not be one of the currentMedoid
+//        double[] randomSubstitute = dataset[r.nextInt(dataset.length)];
+//        neighbor[indexToReplace] = randomSubstitute;
+//        return  neighbor;
+//
+//    }
 }
