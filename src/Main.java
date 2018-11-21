@@ -109,7 +109,7 @@ public class Main {
         // Pam mPam = new Pam(dataFrameInDouble, 5);
         // int[] labels = mPam.fit(100);
 
-        Clarans mClara = new Clarans(dataFrameInDouble, 5, 3, 30);
+        Clara mClara = new Clara(dataFrameInDouble, 5, 3, 30);
         Integer[] labels = mClara.fit(100, true);
 
         for (int i = 0; i < labels.length; i++) {
