@@ -96,13 +96,13 @@ public class Main {
             numberOfCellPoints[j] = hilbertDistance[j];
         }
 
-        // System.out.println(numberOfCellPoints);
-        // System.out.println(hilbertProcess.clusterAdjacentCell(numberOfCellPoints));
-        System.out.println(hilbertProcess.getMedoidPointList(hilbertProcess.clusterAdjacentCell(numberOfCellPoints)));
-
-        // Integer[] numOfCellPoints = {0,4,2,1,0,1,0,0,0,1,1,0,0,1,4};
-        // System.out.println(hilbertProcess.clusterAdjacentCell(numOfCellPoints));
-        // System.out.println(hilbertProcess.getMedoidPointList(hilbertProcess.clusterAdjacentCell(numOfCellPoints)));
+        //System.out.println(numberOfCellPoints);
+        System.out.println(hilbertProcess.clusterAdjacentCell(numberOfCellPoints));
+        //System.out.println(hilbertProcess.getMedoidPointList(hilbertProcess.clusterAdjacentCell(numberOfCellPoints)));
+        
+//        Integer[] numOfCellPoints = {0,4,2,1,0,1,0,0,0,1,1,0,0,1,4};
+//        System.out.println(hilbertProcess.clusterAdjacentCell(numOfCellPoints));
+//        System.out.println(hilbertProcess.getMedoidPointList(hilbertProcess.clusterAdjacentCell(numOfCellPoints)));
 
         // DBScan mDBScan = new DBScan(dataFrameInDouble, 0.5, 5);
         // int[] labels = mDBScan.Scan();
