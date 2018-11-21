@@ -21,76 +21,49 @@ public class HilbertProcess {
         hc = HilbertCurve.bits(bits).dimensions(dimensions);
     }
 
-    public List<List<Integer>> clusterAdjacentCell(Integer[] numOfCellPoints) {
-        List<List<Integer>> clusters = new ArrayList<>();
-        List<Integer> clusterPoints = new ArrayList<>();
-        int numOfClusterPoint = 0;
+		  ByteArrayInputStream byteIn = new ByteArrayInputStream(byteOut.toByteArray());
+		  ObjectInputStream in =new ObjectInputStream(byteIn);
+		  @SuppressWarnings("unchecked")
+		  List<Integer> dest = (List<Integer>)in.readObject();
+		  
+		  return dest;
+	}
+	
+	public ArrayList<List<Long>> getMedoidPointList(List<List<Integer>> cluster){		
+		for (int i=0 ; i < cluster.size() ; i++) {
+			//num of points in the cluster is odd
+			if(cluster.get(i).size() % 2 != 0) {
+				//System.out.println((long)cluster.get(i).get(cluster.get(i).size()/2));
+				List<Long> point = new ArrayList<Long>();
+				for(int j=0; j<dimensions; j++){
+					point.add(hc.point((long)cluster.get(i).get(cluster.get(i).size()/2))[j]);
+				}
+				medoidPointList.add(point);
+			}
+			//num of points in the cluster is even
+			else {
+				//System.out.println((long)cluster.get(i).get(cluster.get(i).size()/2-1));
+				List<Long> point = new ArrayList<Long>();
+				for(int j=0; j<dimensions; j++){
+					point.add(hc.point((long)cluster.get(i).get(cluster.get(i).size()/2-1))[j]);
+				}
+				medoidPointList.add(point);
+			}
+		}
+		
+		return medoidPointList;
+	}
+	public static BigInteger mapCoordinatesToIndex(long[] coordinates, int bits, int dimensions) {
+		HilbertCurve c = HilbertCurve.bits(bits).dimensions(dimensions);
+		BigInteger index = c.index(coordinates);
+		return index;
+	}
+	public static int[] createHilbertDistanceList(BigInteger index, int[] hilbertDistance) {
+		//System.out.println(index.intValue());
+		//System.out.println(hilbertDistance.length);
+		hilbertDistance[index.intValue()] +=1;
+		return hilbertDistance;
+	}
 
-        // Add one cell with 0 point at the end to generate last cluster, e.g: 10,13,14,14,14,14,0 => [13,14,14,14,14]
-        Integer[] numOfCellPointsPlusEndCell = new Integer[numOfCellPoints.length + 1];
-        System.arraycopy(numOfCellPoints, 0, numOfCellPointsPlusEndCell, 0, numOfCellPoints.length);
-        numOfCellPointsPlusEndCell[numOfCellPoints.length] = 0;
 
-        /*         Hilbert index |_0_|_1_|_2_|_3_|_4_|_5_|_6_|_7_|_8_|_9_|_10_|_11_|_12_|_13_|_14_|_15_|
-         * number of cell points | 0 | 4 | 2 | 1 | 0 | 1 | 0 | 0 | 0 | 1 | 1  | 0  | 0  | 1  | 4  | 0  |
-         * if threshold= 3 , cluster=> [[1, 1, 1, 1, 2, 2, 3], [13, 14, 14, 14, 14]]                    */
-        for (int i = 0; i < numOfCellPointsPlusEndCell.length; i++) {
-            if (numOfCellPointsPlusEndCell[i] != 0) {
-                numOfClusterPoint += numOfCellPointsPlusEndCell[i];
-                for (int j = 0; j < numOfCellPointsPlusEndCell[i]; j++) {
-                    clusterPoints.add(i);
-                }
-            } else {
-                if (numOfClusterPoint >= threshold) {
-                    try {
-                        clusters.add(deepCopy(clusterPoints));
-                    } catch (ClassNotFoundException | IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-
-                if (clusterPoints.size() > 0) {
-                    clusterPoints.clear();
-                }
-
-                numOfClusterPoint = 0;
-            }
-        }
-
-        return clusters;
-    }
-
-
-
-    public List<List<Long>> getMedoidPointList(List<List<Integer>> clusters) {
-        List<List<Long>> medoidPoints = new ArrayList<>();
-        for (List<Integer> cluster : clusters) {
-            List<Long> points = new ArrayList<>();
-
-            int medoidIndex;
-            //num of points in the cluster is odd
-            if (cluster.size() % 2 != 0) {
-                medoidIndex = cluster.size() / 2;
-            } else { //num of points in the cluster is even
-                medoidIndex = (cluster.size() / 2) - 1;
-            }
-
-            for (int i = 0; i < dimensions; i++) {
-                points.add(hc.point((long) cluster.get(medoidIndex))[i]);
-            }
-            medoidPoints.add(points);
-        }
-
-        return medoidPoints;
-    }
-
-    public BigInteger mapCoordinatesToIndex(long[] coordinates) {
-        HilbertCurve c = HilbertCurve.bits(bits).dimensions(dimensions);
-        return c.index(coordinates);
-    }
-
-    public int[] createHilbertDistanceList(BigInteger index, int[] hilbertDistance) {
-        hilbertDistance[index.intValue()] += 1;
-        return hilbertDistance;
-    }
 }
