@@ -1,5 +1,7 @@
 package core;
 
+import util.MathUtil;
+
 import java.util.ArrayList;
 
 // TODO: Write docs
@@ -84,7 +86,7 @@ public class DBScan {
         ArrayList<Integer> neighbors = new ArrayList<>();
 
         for (int i = 0; i < this.D.length; i++) {
-            if (Distance.getL2Distance(this.D[P], this.D[i]) < eps) {
+            if (MathUtil.getL2Distance(this.D[P], this.D[i]) < eps) {
                 neighbors.add(i);
             }
         }

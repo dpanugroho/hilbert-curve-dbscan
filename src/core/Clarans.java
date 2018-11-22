@@ -1,5 +1,7 @@
 package core;
 
+import util.MathUtil;
+
 import java.util.List;
 import java.util.Random;
 
@@ -25,7 +27,7 @@ public class Clarans {
             double minCost = Double.POSITIVE_INFINITY;
             for (Integer medoidIndex : medoidIndexes) {
                 double[] currentMedoidPoint = this.dataset[medoidIndex];
-                double currentCost = Distance.getL2Distance(row, currentMedoidPoint);
+                double currentCost = MathUtil.getL2Distance(row, currentMedoidPoint);
 
                 if (currentCost < minCost) {
                     minCost = currentCost;
@@ -62,7 +64,7 @@ public class Clarans {
             double minCost = Double.POSITIVE_INFINITY;
             for (int j = 0; j < bestMedoid.size(); j++) {
                 double[] currentMedoidPOint = this.dataset[bestMedoid.get(j)];
-                double currentCost = Distance.getL2Distance(dataset[i], currentMedoidPOint);
+                double currentCost = MathUtil.getL2Distance(dataset[i], currentMedoidPOint);
 
                 if (currentCost < minCost) {
                     minCost = currentCost;
