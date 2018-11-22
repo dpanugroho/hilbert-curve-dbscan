@@ -27,7 +27,7 @@ public class Clarans {
                 double[] currentMedoidPoint = this.dataset[medoidIndex];
                 double currentCost = Distance.getL2Distance(row, currentMedoidPoint);
 
-                if (currentCost < minCost){
+                if (currentCost < minCost) {
                     minCost = currentCost;
                 }
             }
@@ -58,15 +58,15 @@ public class Clarans {
             iterCount++;
         }
 
-        for(int i = 0; i < dataset.length; i++){
+        for (int i = 0; i < dataset.length; i++) {
             double minCost = Double.POSITIVE_INFINITY;
-            for (int j = 0;j<bestMedoid.size(); j++){
+            for (int j = 0; j < bestMedoid.size(); j++) {
                 double[] currentMedoidPOint = this.dataset[bestMedoid.get(j)];
                 double currentCost = Distance.getL2Distance(dataset[i], currentMedoidPOint);
 
-                if (currentCost < minCost){
+                if (currentCost < minCost) {
                     minCost = currentCost;
-                    labels[i]=bestMedoid.get(j);
+                    labels[i] = bestMedoid.get(j);
                 }
             }
         }
@@ -78,8 +78,15 @@ public class Clarans {
         Random r = new Random();
         int indexToReplace = r.nextInt(neighbor.size());
 
-        // TODO: The substitute should not be one of the currentMedoid
-        Integer randomSubstitute = r.nextInt(dataset.length);
+        // Prevent substitution is exist in current medoid list
+        boolean isSubstituteExist = true;
+        Integer randomSubstitute = 0;
+        while (isSubstituteExist) {
+            randomSubstitute = r.nextInt(dataset.length);
+            if (!neighbor.contains(randomSubstitute)) {
+                isSubstituteExist = false;
+            }
+        }
         neighbor.set(indexToReplace, randomSubstitute);
         return neighbor;
 
