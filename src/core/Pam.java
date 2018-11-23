@@ -1,5 +1,7 @@
 package core;
 
+import util.MathUtil;
+
 import java.util.concurrent.ThreadLocalRandom;
 
 /**
@@ -21,7 +23,7 @@ public class Pam {
         // for each cluster label in [0..k]
         double totalCost = 0;
         for (int i = 0; i < labels.length; i++) {
-            totalCost += Distance.getL2Distance(dataset[i], dataset[labels[i]]);
+            totalCost += MathUtil.getL2Distance(dataset[i], dataset[labels[i]]);
         }
         return totalCost;
     }
@@ -44,7 +46,7 @@ public class Pam {
             for (int medoidIndex : randomMedoidIndex) {
                 // Only compute point which is not medoid
                 if (row != dataset[medoidIndex]) {
-                    double currentDistance = Distance.getL2Distance(row, dataset[medoidIndex]);
+                    double currentDistance = MathUtil.getL2Distance(row, dataset[medoidIndex]);
                     if (currentDistance < min) {
                         min = currentDistance;
                         labels[i] = medoidIndex;
