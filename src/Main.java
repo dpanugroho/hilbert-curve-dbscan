@@ -1,4 +1,4 @@
-import core.Clara;
+import beans.Point;
 import core.Clarans;
 import util.InputReader;
 import util.MathUtil;
@@ -6,8 +6,6 @@ import hilbert.HilbertProcess;
 
 import java.io.FileNotFoundException;
 import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class Main {
@@ -40,22 +38,26 @@ public class Main {
             e.printStackTrace();
         }
 
+        Point[] datasetInPoint = new Point[dataFrameInDouble.length];
+        for (int i = 0; i < dataFrameInDouble.length; i++) {
+            datasetInPoint[i] = new Point(dataFrameInDouble[i]);
+        }
 //        System.out.println(dataFrameInDouble[0].length); // 4D
 //        System.out.println(dataFrameInDouble.length); // 150
 
 //        testNormalized = new double[dataFrameInDouble.length][dataFrameInDouble[0].length];
-        dataFrameHilbert = new long[dataFrameInDouble.length][dataFrameInDouble[0].length];
+        dataFrameHilbert = new long[datasetInPoint.length][datasetInPoint[0].getCoordinates().length];
         // normalize data,get coordinate,get Hilbert index
-        for (int j = 0; j < dataFrameInDouble[0].length; j++) {
-            Double[] column = new Double[dataFrameInDouble.length];
-            for (int i = 0; i < dataFrameInDouble.length; i++) {
-                column[i] = dataFrameInDouble[i][j];
+        for (int j = 0; j < datasetInPoint[0].getCoordinates().length; j++) {
+            Double[] column = new Double[datasetInPoint.length];
+            for (int i = 0; i < datasetInPoint.length; i++) {
+                column[i] = datasetInPoint[i].getCoordinates()[j];
             }
             // normalize
             double[] normalizedData = MathUtil.normalize(column).clone();
             // getHilbertCoordinate
             long[] HilbertCoordinate = MathUtil.getHilbertCoordinate(normalizedData, bits).clone();
-            for (int i = 0; i < dataFrameInDouble.length; i++) {
+            for (int i = 0; i < datasetInPoint.length; i++) {
 //                testNormalized[i][j] = normalizedData[i];
                 dataFrameHilbert[i][j] = HilbertCoordinate[i];
             }
@@ -79,10 +81,10 @@ public class Main {
         HilbertProcess hilbertProcess = new HilbertProcess(bits, dimensions, threshold);
 //
 //        // Find Hilbert index
-        for (int i = 0; i < dataFrameInDouble.length; i++) {
-            long[] coordinates = new long[dataFrameInDouble[0].length];
+        for (int i = 0; i < datasetInPoint.length; i++) {
+            long[] coordinates = new long[datasetInPoint[0].getCoordinates().length];
             BigInteger index = BigInteger.valueOf(0);
-            for (int j = 0; j < dataFrameInDouble[0].length; j++) {
+            for (int j = 0; j < datasetInPoint[0].getCoordinates().length; j++) {
                 coordinates[j] = dataFrameHilbert[i][j];
             }
 //            System.out.println("i=" + i);
@@ -100,8 +102,9 @@ public class Main {
         // get List<Integer> of initialMedoid Using Hilbert
         List<Integer> initialMedoid = hilbertProcess.getMedoidPointIndexList(hilbertProcess.clusterAdjacentCell(numberOfCellPoints), indexOfCoordinates);
         // getPartition Using Clarans
-        Clarans mClara = new Clarans(dataFrameInDouble, 3, initialMedoid);
+        Clarans mClara = new Clarans(datasetInPoint, 3, initialMedoid);
         Integer[] labels = mClara.assign(10);
+
 
         // TODO: Run DBScan for each partition genrated by CLarans
 

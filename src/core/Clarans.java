@@ -1,17 +1,18 @@
 package core;
 
+import beans.Point;
 import util.MathUtil;
 
 import java.util.List;
 import java.util.Random;
 
 public class Clarans {
-    private double[][] dataset;
+    private Point[] dataset;
     private int maxNeighborToCheck;
     private List<Integer> initialMedoid; //List of index of the initial medoid
 
-    public Clarans(double[][] dataset, int maxNeighborToCheck, List<Integer> initialMedoid) {
-        this.dataset = dataset;
+    public Clarans(Point[] points, int maxNeighborToCheck, List<Integer> initialMedoid) {
+        this.dataset = points;
         this.maxNeighborToCheck = maxNeighborToCheck;
         this.initialMedoid = initialMedoid;
     }
@@ -23,10 +24,10 @@ public class Clarans {
 
         double totalCost = 0;
 
-        for (double[] row : this.dataset) {
+        for (Point row : this.dataset) {
             double minCost = Double.POSITIVE_INFINITY;
             for (Integer medoidIndex : medoidIndexes) {
-                double[] currentMedoidPoint = this.dataset[medoidIndex];
+                Point currentMedoidPoint = this.dataset[medoidIndex];
                 double currentCost = MathUtil.getL2Distance(row, currentMedoidPoint);
 
                 if (currentCost < minCost) {
@@ -63,7 +64,7 @@ public class Clarans {
         for (int i = 0; i < dataset.length; i++) {
             double minCost = Double.POSITIVE_INFINITY;
             for (int j = 0; j < bestMedoid.size(); j++) {
-                double[] currentMedoidPOint = this.dataset[bestMedoid.get(j)];
+                Point currentMedoidPOint = this.dataset[bestMedoid.get(j)];
                 double currentCost = MathUtil.getL2Distance(dataset[i], currentMedoidPOint);
 
                 if (currentCost < minCost) {

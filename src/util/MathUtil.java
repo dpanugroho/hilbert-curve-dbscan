@@ -1,5 +1,7 @@
 package util;
 
+import beans.Point;
+
 import java.util.Arrays;
 import java.util.Collections;
 
@@ -27,20 +29,20 @@ public class MathUtil {
     }
 
     // TODO: Write docs
-    public static double getL2Distance(double[] source, double[] target) {
+    public static double getL2Distance(Point source, Point target) {
         // TODO: Check to make sure source and target has the same dimension
 
         // Calculate the distance
         float tmp = 0;
-        for (int i = 0; i < source.length; i++) {
-            tmp += Math.pow((source[i] - target[i]), 2);
+        for (int i = 0; i < source.getCoordinates().length; i++) {
+            tmp += Math.pow((source.getCoordinates()[i] - target.getCoordinates()[i]), 2);
         }
         return Math.sqrt(tmp);
     }
 
-    public static double L2Cost(double[][] dataset, double[] currentRandomNeighbor) {
+    public static double L2Cost(Point[] dataset, Point currentRandomNeighbor) {
         double totalCost = 0;
-        for(int i = 0; i < currentRandomNeighbor.length; i++){
+        for(int i = 0; i < currentRandomNeighbor.getCoordinates().length; i++){
             totalCost += getL2Distance(dataset[i], currentRandomNeighbor);
         }
         return totalCost;

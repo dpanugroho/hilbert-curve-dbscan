@@ -1,18 +1,19 @@
 package core;
 
+import beans.Point;
 import util.MathUtil;
 
 import java.util.ArrayList;
 
 // TODO: Write docs
 public class DBScan {
-    double[][] D;
+    Point[] D;
     int[] labels;
     boolean[] visited;
     double eps;
     int minPts;
 
-    public DBScan(double[][] D, double eps, int minPts) {
+    public DBScan(Point[] D, double eps, int minPts) {
         this.D = D;
         this.labels = new int[D.length];
         this.visited = new boolean[D.length];
