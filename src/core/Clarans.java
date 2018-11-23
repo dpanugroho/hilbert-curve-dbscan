@@ -1,60 +1,97 @@
 package core;
 
-import java.util.*;
-import java.util.concurrent.ThreadLocalRandom;
+import beans.Point;
+import util.MathUtil;
+
+import java.util.List;
+import java.util.Random;
 
 public class Clarans {
-    double[][] dataset;
-    int k;
-    int n_sample;
-    int sample_size;
+    private Point[] dataset;
+    private int maxNeighborToCheck;
+    private List<Integer> initialMedoid; //List of index of the initial medoid
 
-    public Clarans(double[][] dataset, int k, int n_sample, int sample_size) {
-        this.dataset = dataset;
-        this.k = k;
-        this.n_sample = n_sample;
-        this.sample_size = sample_size;
+    public Clarans(Point[] points, int maxNeighborToCheck, List<Integer> initialMedoid) {
+        this.dataset = points;
+        this.maxNeighborToCheck = maxNeighborToCheck;
+        this.initialMedoid = initialMedoid;
     }
 
-    private double[][] sample() {
-        double[][] sample = new double[sample_size][this.dataset[0].length];
-        int[] sample_index = new int[sample_size];
-        for (int i = 0; i < sample_size; i++) {
-            sample[i] = dataset[ThreadLocalRandom.current().nextInt(0, dataset.length)];
-        }
-        return sample;
-    }
+    private double getCost(List<Integer> medoidIndexes) {
 
-    public Integer[] fit(int maxIter, boolean parallelize) {
-        Pam mPam = new Pam(sample(), this.k);
-        Integer[] bestLabel = new Integer[dataset.length];
-        double minCost = Double.POSITIVE_INFINITY;
+        // Assign each point to its nearest medoid
+        // Calculate the cost along the way
 
-        if (parallelize) {
-            List<Integer[]> labels = new ArrayList<>();
-            List<Double> costs = new ArrayList<>();
+        double totalCost = 0;
 
-            Arrays.asList(n_sample).parallelStream().forEach((sample) -> {
-                Integer[] currentLabel = mPam.fit(maxIter);
-                double currentCost = mPam.getCost(currentLabel);
+        for (Point row : this.dataset) {
+            double minCost = Double.POSITIVE_INFINITY;
+            for (Integer medoidIndex : medoidIndexes) {
+                Point currentMedoidPoint = this.dataset[medoidIndex];
+                double currentCost = MathUtil.getL2Distance(row, currentMedoidPoint);
 
-                labels.add(currentLabel);
-                costs.add(currentCost);
-            });
-
-            int bestLabelIndex = costs.indexOf(Collections.min(costs));
-            bestLabel = labels.get(bestLabelIndex);
-        } else {
-            for (int i = 0; i < n_sample; i++) {
-                Integer[] currentLabel = mPam.fit(maxIter);
-                double currentCost = mPam.getCost(currentLabel);
                 if (currentCost < minCost) {
-                    bestLabel = currentLabel;
                     minCost = currentCost;
                 }
             }
+            totalCost += minCost;
+        }
+        return totalCost;
+    }
+
+    public Integer[] assign(int maxIter) {
+        int iterCount = 0;
+        int checkedNeighbor = 0;
+        Integer[] labels = new Integer[this.dataset.length];
+
+        // Initiate bestMedoid as initial medoid, and bestCost as cost of thi initial medoid
+        List<Integer> bestMedoid = this.initialMedoid;
+        double bestCost = this.getCost(bestMedoid);
+
+        while (iterCount < maxIter) {
+            while (checkedNeighbor < maxNeighborToCheck) {
+                List<Integer> currentRandomNeighbor = this.getRandomNeighbor(bestMedoid);
+                double currentCost = this.getCost(currentRandomNeighbor);
+                if (currentCost < bestCost) {
+                    bestMedoid = currentRandomNeighbor;
+                    bestCost = currentCost;
+                }
+                checkedNeighbor++;
+            }
+            iterCount++;
         }
 
-        return bestLabel;
+        for (int i = 0; i < dataset.length; i++) {
+            double minCost = Double.POSITIVE_INFINITY;
+            for (int j = 0; j < bestMedoid.size(); j++) {
+                Point currentMedoidPOint = this.dataset[bestMedoid.get(j)];
+                double currentCost = MathUtil.getL2Distance(dataset[i], currentMedoidPOint);
+
+                if (currentCost < minCost) {
+                    minCost = currentCost;
+                    labels[i] = bestMedoid.get(j);
+                }
+            }
+        }
+        return labels;
+    }
+
+    private List<Integer> getRandomNeighbor(List<Integer> bestMedoid) {
+        List<Integer> neighbor = bestMedoid;
+        Random r = new Random();
+        int indexToReplace = r.nextInt(neighbor.size());
+
+        // Prevent substitution is exist in current medoid list
+        boolean isSubstituteExist = true;
+        Integer randomSubstitute = 0;
+        while (isSubstituteExist) {
+            randomSubstitute = r.nextInt(dataset.length);
+            if (!neighbor.contains(randomSubstitute)) {
+                isSubstituteExist = false;
+            }
+        }
+        neighbor.set(indexToReplace, randomSubstitute);
+        return neighbor;
+
     }
 }

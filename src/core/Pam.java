@@ -1,5 +1,8 @@
 package core;
 
+import beans.Point;
+import util.MathUtil;
+
 import java.util.concurrent.ThreadLocalRandom;
 
 /**
@@ -8,10 +11,10 @@ import java.util.concurrent.ThreadLocalRandom;
  */
 
 public class Pam {
-    private double[][] dataset;
+    private Point[] dataset;
     private int k;
 
-    public Pam(double[][] dataset, int k) {
+    public Pam(Point[] dataset, int k) {
         this.dataset = dataset;
         this.k = k;
 
@@ -21,7 +24,7 @@ public class Pam {
         // for each cluster label in [0..k]
         double totalCost = 0;
         for (int i = 0; i < labels.length; i++) {
-            totalCost += Distance.getL2Distance(dataset[i], dataset[labels[i]]);
+            totalCost += MathUtil.getL2Distance(dataset[i], dataset[labels[i]]);
         }
         return totalCost;
     }
@@ -37,14 +40,14 @@ public class Pam {
 
         // Assign non meodid to it's closest medoid
         for (int i = 0; i < dataset.length; i++) {
-            double[] row = dataset[i];
+            Point row = dataset[i];
 
             // calculate distance between medoid and other cluster
             double min = Double.POSITIVE_INFINITY;
             for (int medoidIndex : randomMedoidIndex) {
                 // Only compute point which is not medoid
                 if (row != dataset[medoidIndex]) {
-                    double currentDistance = Distance.getL2Distance(row, dataset[medoidIndex]);
+                    double currentDistance = MathUtil.getL2Distance(row, dataset[medoidIndex]);
                     if (currentDistance < min) {
                         min = currentDistance;
                         labels[i] = medoidIndex;
