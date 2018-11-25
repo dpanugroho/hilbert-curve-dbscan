@@ -28,7 +28,7 @@ public class DBScan {
 
         // Go through all points in dataset
         for (Point p: this.D) {
-            if (p.isVisited()) {
+            if (!p.isVisited()) {
                 ArrayList<Point> neighborPts = regionQuery(p, this.eps);
                 if (neighborPts.size() < this.minPts) {
                     p.setVisited(true);
