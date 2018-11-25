@@ -8,15 +8,11 @@ import java.util.ArrayList;
 // TODO: Write docs
 public class DBScan {
     Point[] D;
-    int[] labels;
-    boolean[] visited;
-    double eps;
-    int minPts;
+    private double eps;
+    private int minPts;
 
     public DBScan(Point[] D, double eps, int minPts) {
         this.D = D;
-        this.labels = new int[D.length];
-        this.visited = new boolean[D.length];
         this.eps = eps;
         this.minPts = minPts;
     }
@@ -26,24 +22,25 @@ public class DBScan {
      *
      * @return labels for each points
      */
-    public int[] Scan() {
+    public Point[] Scan() {
         // c is ID if current cluster
         int c = 0;
 
         // Go through all points in dataset
-        for (int p = 0; p < this.D.length; p++) {
-            // 0: not visited yet, -1: doesn't belong to any cluster, other: belong to the specified cluster
-            if (!this.visited[p]) {
-                ArrayList<Integer> neighborPts = regionQuery(p, this.eps);
+        for (Point p: this.D) {
+            if (!p.isVisited()) {
+                ArrayList<Point> neighborPts = regionQuery(p, this.eps);
                 if (neighborPts.size() < this.minPts) {
-                    this.visited[p] = true;
+                    p.setVisited(true);
                 } else {
                     c++; // change to the next cluster
+                    // a point is a core point if it has more than a specified number of points (MinPts) within Eps
+                    p.setCore(true);
                     neighborPts.addAll(expandCluster(p, neighborPts, c, this.eps, this.minPts));
                 }
             }
         }
-        return labels;
+        return this.D;
     }
 
     /**
@@ -55,22 +52,22 @@ public class DBScan {
      * @param eps         epsion value
      * @param minPts      minimum number of neighbors for a point to be considered as a cluster
      */
-    private ArrayList<Integer> expandCluster(int p, ArrayList<Integer> neighborPts, int c, double eps, double minPts) {
-        this.visited[p] = true; // mark p as visited
-        this.labels[p] = c; // add p to cluster c
+    private ArrayList<Point> expandCluster(Point p, ArrayList<Point> neighborPts, int c, double eps, double minPts) {
+        p.setVisited(true); // mark p as visited
+        p.setLabel(c); // add p to cluster c
 
         for (int i = 0; i < neighborPts.size(); i++) {
-            int Pn = neighborPts.get(i);
+            Point Pn = neighborPts.get(i);
 
-            if (!this.visited[Pn]) {
-                this.visited[Pn] = true; // mark P' as visited
-                ArrayList<Integer> PnNeighborPts = regionQuery(Pn, eps);
+            if (!Pn.isVisited()) {
+                Pn.setVisited(true); // mark P' as visited
+                ArrayList<Point> PnNeighborPts = regionQuery(Pn, eps);
                 if (PnNeighborPts.size() >= minPts) {
                     neighborPts.addAll(PnNeighborPts);
                 }
             }
-            if (this.labels[Pn] < 1) { // if P' is not yet member of any cluster
-                this.labels[Pn] = c; // add P' to cluster c
+            if (Pn.getLabel() < 1) { // if P' is not yet member of any cluster
+                Pn.setLabel(c); // add P' to cluster c
             }
         }
 
@@ -78,17 +75,17 @@ public class DBScan {
     }
 
     /**
-     * Find all points in dataset `D` within distance `eps` of point `P`.
+     * Find all points in dataset `D` within distance `eps` from point `P`.
      *
-     * @param P index of core point
-     * @return
+     * @param p core point
+     * @return neighborPoints that is within distance `eps` from point `P`.
      */
-    private ArrayList<Integer> regionQuery(int P, double eps) {
-        ArrayList<Integer> neighbors = new ArrayList<>();
+    private ArrayList<Point> regionQuery(Point p, double eps) {
+        ArrayList<Point> neighbors = new ArrayList<>();
 
-        for (int i = 0; i < this.D.length; i++) {
-            if (MathUtil.getL2Distance(this.D[P], this.D[i]) < eps) {
-                neighbors.add(i);
+        for (Point neighborCandidate: this.D) {
+            if (MathUtil.getL2Distance(p, neighborCandidate) < eps) {
+                neighbors.add(neighborCandidate);
             }
         }
 
