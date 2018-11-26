@@ -9,12 +9,14 @@ import beans.Cluster;
 import beans.Point;
 
 public class Merge {
-    double eps;
     List<Cluster> clusters;
+    double eps;
+    double mergeThreshold;
 
-    public Merge(double eps, List<Cluster> clusters) {
-        this.eps = eps;
+    public Merge(List<Cluster> clusters, double eps, double mergeThreshold) {
         this.clusters = clusters;
+        this.eps = eps;
+        this.mergeThreshold = mergeThreshold;
     }
 
     private Cluster getBorderCluster(Cluster cluster) {
@@ -57,14 +59,7 @@ public class Merge {
         double sizeA = (double) borderClusterA.getMembers().size();
         double sizeB = (double) borderClusterB.getMembers().size();
 
-        /**
-         *                                    eps
-         *  Merge threshold = -----------------------------------
-         *                    max num of points between 2 cluster
-         */
-        double mergeThreshold = (this.eps / Math.max(sizeA, sizeB));
-
-        return ((double) count) / ((sizeA + sizeB) / 2) >= mergeThreshold;
+        return ((double) count) / ((sizeA + sizeB) / 2) >= this.mergeThreshold;
     }
 
     private Cluster merge(Cluster clusterA, Cluster clusterB) {
