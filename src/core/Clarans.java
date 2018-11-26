@@ -3,8 +3,7 @@ package core;
 import beans.Point;
 import util.MathUtil;
 
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 public class Clarans {
     private Point[] dataset;
@@ -39,7 +38,7 @@ public class Clarans {
         return totalCost;
     }
 
-    public Integer[] assign(int maxIter) {
+    public List<Point[]> assign(int maxIter) {
         int iterCount = 0;
         int checkedNeighbor = 0;
         Integer[] labels = new Integer[this.dataset.length];
@@ -73,7 +72,26 @@ public class Clarans {
                 }
             }
         }
-        return labels;
+
+        Integer[] unique = Arrays.stream(labels).distinct().toArray(Integer[]::new);
+        ArrayList<ArrayList<Point>> intermediate = new ArrayList<>();
+        List<Point[]> result = new ArrayList<>();
+        for (int u = 0; u < unique.length; u++) {
+            intermediate.add(new ArrayList<>());
+        }
+        for (int i = 0; i < dataset.length; i++) {
+            for (int j = 0; j < unique.length; j++) {
+                if (labels[i] == unique[j]) {
+                    intermediate.get(j).add(this.dataset[i]);
+                }
+            }
+        }
+
+        for (int i = 0; i < intermediate.size(); i++){
+            result.add(intermediate.get(i).toArray(new Point[intermediate.get(i).size()]));
+        }
+        return result;
+
     }
 
     private List<Integer> getRandomNeighbor(List<Integer> bestMedoid) {

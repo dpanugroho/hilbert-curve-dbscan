@@ -3,13 +3,13 @@ package beans;
 public class Point {
     double[] coordinates;
     boolean isCore;
-    int label;
+    String label;
     boolean isVisited;
 
     public Point(double[] coordinates) {
         this.coordinates = coordinates;
         this.isCore = false;
-        this.label = 0; // -1: no cluster, 0: not processed yet, other: belong to specified cluster
+        this.label = ""; // -1: no cluster, 0: not processed yet, other: belong to specified cluster
         this.isVisited = false;
     }
 
@@ -20,7 +20,7 @@ public class Point {
     public boolean isBorder() {
         // A border point has fewer than MinPts within Eps, but is in the neighborhood of a core point.
         // That means if it belong to a cluster, but not a core point then it's a border point
-        return (!isCore && label > 0);
+        return (!isCore && label.equals(""));
     }
 
     public boolean isCore() {
@@ -39,11 +39,11 @@ public class Point {
         isVisited = visited;
     }
 
-    public int getLabel() {
+    public String getLabel() {
         return label;
     }
 
-    public void setLabel(int label) {
+    public void setLabel(String label) {
         this.label = label;
     }
 }
