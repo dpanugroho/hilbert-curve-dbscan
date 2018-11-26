@@ -1,11 +1,13 @@
 import beans.Point;
 import core.Clarans;
+import core.DBScan;
 import util.InputReader;
 import util.MathUtil;
 import hilbert.HilbertProcess;
 
 import java.io.FileNotFoundException;
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.List;
 
 public class Main {
@@ -86,8 +88,10 @@ public class Main {
         Clarans clarans = new Clarans(datasetInPoint, threshold, initialMedoid);
         List<Point[]> labels = clarans.assign(10);
 
-
-        // TODO: Run DBScan for each partition genrated by CLarans
-
+        List<Point[]> dbScanResult = new ArrayList<>();
+        labels.parallelStream().forEach((label) -> {
+            DBScan scan = new DBScan(label, 0.5, 5);
+            dbScanResult.add(scan.Scan());
+        });
     }
 }
