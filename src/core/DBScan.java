@@ -23,20 +23,23 @@ public class DBScan {
      * @return labels for each points
      */
     public Point[] Scan() {
-        // c is ID if current cluster
-        int c = 0;
 
         // Go through all points in dataset
         for (Point p: this.D) {
             if (!p.isVisited()) {
                 ArrayList<Point> neighborPts = regionQuery(p, this.eps);
                 if (neighborPts.size() < this.minPts) {
+                    // An outlier is a cluster with only 1 member
+                    int outlierId = (int) (System.currentTimeMillis() / 1000L);
                     p.setVisited(true);
+                    p.setLabel(outlierId);
                 } else {
-                    c++; // change to the next cluster
+                    // change to the next cluster with unix timestamp as its name
+                    int clusterId = (int) (System.currentTimeMillis() / 1000L);
                     // a point is a core point if it has more than a specified number of points (MinPts) within Eps
                     p.setCore(true);
-                    neighborPts.addAll(expandCluster(p, neighborPts, c, this.eps, this.minPts));
+                    p.setLabel(clusterId);
+                    neighborPts.addAll(expandCluster(p, neighborPts, clusterId, this.eps, this.minPts));
                 }
             }
         }
@@ -49,13 +52,13 @@ public class DBScan {
      *
      * @param p           a point
      * @param neighborPts neighbor points of p
-     * @param c           cluster id
+     * @param clusterId   cluster id
      * @param eps         epsion value
      * @param minPts      minimum number of neighbors for a point to be considered as a cluster
      */
-    private ArrayList<Point> expandCluster(Point p, ArrayList<Point> neighborPts, int c, double eps, double minPts) {
+    private ArrayList<Point> expandCluster(Point p, ArrayList<Point> neighborPts, int clusterId, double eps, double minPts) {
         p.setVisited(true); // mark p as visited
-        p.setLabel(c); // add p to cluster c
+        p.setLabel(clusterId); // add p to cluster with id clusterId
 
         for (int i = 0; i < neighborPts.size(); i++) {
             Point Pn = neighborPts.get(i);
@@ -68,7 +71,7 @@ public class DBScan {
                 }
             }
             if (Pn.getLabel() < 1) { // if P' is not yet member of any cluster
-                Pn.setLabel(c); // add P' to cluster c
+                Pn.setLabel(clusterId); // add P' to cluster c
             }
         }
 
