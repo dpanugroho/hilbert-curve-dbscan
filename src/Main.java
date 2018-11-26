@@ -84,7 +84,7 @@ public class Main {
 
         // Run CLARANS on dataset, and get list of cluster
         Clarans clarans = new Clarans(datasetInPoint, threshold, initialMedoid);
-        Integer[] labels = clarans.assign(10);
+        List<Point[]> labels = clarans.assign(10);
 
 
         // TODO: Run DBScan for each partition genrated by CLarans
