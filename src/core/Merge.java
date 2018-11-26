@@ -96,9 +96,11 @@ public class Merge {
     	   C -> D
     	   D -> no need to do
     	 * */
+
+    	boolean[][] mergeabilityMatrix = new boolean[borderClusters.size()][borderClusters.size()];
         for (int i = 0; i < borderClusters.size() - 1; i++) {
             for (int j = i + 1; j < borderClusters.size(); j++) {
-                boolean mergeability = mergeability(borderClusters.get(i), borderClusters.get(j));
+                mergeabilityMatrix[i][j] = mergeability(borderClusters.get(i), borderClusters.get(j));
             }
         }
 
