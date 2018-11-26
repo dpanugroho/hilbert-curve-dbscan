@@ -19,7 +19,6 @@ public class Main {
         int bits = 2;
         int dimensions = 4;
         int threshold = 3;
-        double merge_threshold= 2/9;
         
         int[] hilbertDistance = new int[(int) Math.pow(Math.pow(2, bits), dimensions)];
         int[] indexOfCoordinates = new int[(int) Math.pow(Math.pow(2, bits), dimensions)];

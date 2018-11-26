@@ -8,69 +8,77 @@ import java.util.List;
 import beans.Cluster;
 import beans.Point;
 
-// TODO: Write docs
 public class Merge {
     double eps;
-    double merge_threshold;
-    List<Cluster> clusterList = new ArrayList<>();
+    List<Cluster> clusters;
 
-    public Merge(double eps, double merge_threshold, List<Cluster> clusterList) {
+    public Merge(double eps, List<Cluster> clusters) {
         this.eps = eps;
-        this.merge_threshold = merge_threshold;
-        this.clusterList = clusterList;
+        this.clusters = clusters;
     }
 
-    private Cluster getBoarderCluster(Cluster cluster) {
-    	Cluster onlyBorder = new Cluster();
-    	for(Point p: cluster.getMembers()) {
-    		if(p.isBorder()) {
-    			onlyBorder.add(p);
-    		}
-    	} 	
-    	return onlyBorder;
+    private Cluster getBorderCluster(Cluster cluster) {
+        Cluster onlyBorder = new Cluster();
+
+        for (Point p : cluster.getMembers()) {
+            if (p.isBorder()) {
+                onlyBorder.add(p);
+            }
+        }
+
+        return onlyBorder;
     }
-    
-    private List<Cluster> getBoarderClusterList(List<Cluster> clusterList){
-    	List<Cluster> boarderClusterList = new ArrayList<>();  	
-    	for (int i = 0; i < clusterList.size(); i++) {
-    		boarderClusterList.add(i, getBoarderCluster(clusterList.get(i)));
-    	}	
-    	return boarderClusterList;
+
+    private List<Cluster> getBorderClusterList(List<Cluster> clusters) {
+        List<Cluster> borderClusters = new ArrayList<>();
+
+        for (Cluster cluster: clusters) {
+            borderClusters.add(getBorderCluster(cluster));
+        }
+
+        return borderClusters;
     }
-    
-    private double findNumOfInterCon(Cluster boarderClusterA, Cluster boarderClusterB){
-    	double numOfInterConnect = 0;   	
-    	for(int i=0 ; i < boarderClusterA.getMembers().size() ; i++) {
-    		for(int j=0 ; j < boarderClusterB.getMembers().size() ; j++) {
-    			if (MathUtil.getL2Distance(boarderClusterA.getMembers().get(i), boarderClusterB.getMembers().get(j)) < eps)
-    				numOfInterConnect++;
-    		}
-    	}
-    	return numOfInterConnect;
+
+    private int countInterconnection(Cluster clusterA, Cluster clusterB) {
+        int interconnection = 0;
+        for (Point pointA: clusterA.getMembers()) {
+            for (Point pointB: clusterB.getMembers()) {
+                if (MathUtil.getL2Distance(pointA, pointB) < this.eps) {
+                    interconnection++;
+                }
+            }
+        }
+
+        return interconnection;
     }
-    
-    private boolean mergeEvaluate(Cluster boarderClusterA, Cluster boarderClusterB){
-    	double numOfInterConnect = findNumOfInterCon(boarderClusterA,boarderClusterB);
-    	double sizeOfBoarderClusterA = (double) boarderClusterA.getMembers().size();
-    	double sizeOfBoarderClusterB = (double) boarderClusterB.getMembers().size();;
-    	
-    	if ( (numOfInterConnect / ((sizeOfBoarderClusterA + sizeOfBoarderClusterB)/2)) >= merge_threshold ) {   		 
-   		  return true;
-   	 	}
-    	return false;
+
+    private boolean mergeability(Cluster borderClusterA, Cluster borderClusterB) {
+        int count = countInterconnection(borderClusterA, borderClusterB);
+        double sizeA = (double) borderClusterA.getMembers().size();
+        double sizeB = (double) borderClusterB.getMembers().size();
+
+        /**
+         *                                    eps
+         *  Merge threshold = -----------------------------------
+         *                    max num of points between 2 cluster
+         */
+        double mergeThreshold = (this.eps / Math.max(sizeA, sizeB));
+
+        return ((double) count) / ((sizeA + sizeB) / 2) >= mergeThreshold;
     }
-    
-    private Cluster mergeCluster(Cluster clusterA, Cluster clusterB) {
-    	for(Point p: clusterB.getMembers()) {
-    		clusterA.add(p);
-    	} 	
-    	return clusterA; 
+
+    private Cluster merge(Cluster clusterA, Cluster clusterB) {
+        for (Point p : clusterB.getMembers()) {
+            clusterA.add(p);
+            // TODO: Set points' label to cluster A's label
+        }
+
+        return clusterA;
     }
-    
-    private List<Cluster> mainProcess(){
-    	List<Cluster> clusterListAfterMerge = new ArrayList<>();
-    	List<Cluster> boarderCluster = new ArrayList<>();
-    	boarderCluster = getBoarderClusterList(clusterList);
+
+    public List<Cluster> mergeAll() {
+        List<Cluster> clustersAfterMerge = new ArrayList<>();
+        List<Cluster> borderClusters = getBorderClusterList(clusters);
     	
     	/* Assume that we have A,B,C,D => 4 clusters
     	   A -> B, C, D
@@ -78,13 +86,13 @@ public class Merge {
     	   C -> D
     	   D -> no need to do
     	 * */
-    	for(int i=0 ; i < boarderCluster.size()-1 ; i++) {
-    		for(int j=i+1 ; j < boarderCluster.size() ; j++) {
-    			mergeEvaluate(boarderCluster.get(i), boarderCluster.get(j));
-    		}   		
-    	}
-    	
-    	return clusterListAfterMerge;
+        for (int i = 0; i < borderClusters.size() - 1; i++) {
+            for (int j = i + 1; j < borderClusters.size(); j++) {
+                boolean mergeability = mergeability(borderClusters.get(i), borderClusters.get(j));
+            }
+        }
+
+        return clustersAfterMerge;
     }
-    
+
 }

@@ -40,6 +40,7 @@ public class DBScan {
                 }
             }
         }
+
         return this.D;
     }
 
