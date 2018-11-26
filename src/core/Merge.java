@@ -34,17 +34,32 @@ public class Merge {
     private List<Cluster> getBorderClusterList(List<Cluster> clusters) {
         List<Cluster> borderClusters = new ArrayList<>();
 
-        for (Cluster cluster: clusters) {
+        for (Cluster cluster : clusters) {
             borderClusters.add(getBorderCluster(cluster));
         }
 
         return borderClusters;
     }
 
+    private int countInterconnection(Cluster cluster) {
+        int interconnection = 0;
+        for (int i = 0; i < cluster.getMembers().size(); i++) {
+            for (int j = i + 1; j < cluster.getMembers().size(); j++) {
+                Point pointA = cluster.getMembers().get(i);
+                Point pointB = cluster.getMembers().get(j);
+                if (MathUtil.getL2Distance(pointA, pointB) < this.eps) {
+                    interconnection++;
+                }
+            }
+        }
+
+        return interconnection;
+    }
+
     private int countInterconnection(Cluster clusterA, Cluster clusterB) {
         int interconnection = 0;
-        for (Point pointA: clusterA.getMembers()) {
-            for (Point pointB: clusterB.getMembers()) {
+        for (Point pointA : clusterA.getMembers()) {
+            for (Point pointB : clusterB.getMembers()) {
                 if (MathUtil.getL2Distance(pointA, pointB) < this.eps) {
                     interconnection++;
                 }
@@ -56,10 +71,10 @@ public class Merge {
 
     private boolean mergeability(Cluster borderClusterA, Cluster borderClusterB) {
         int count = countInterconnection(borderClusterA, borderClusterB);
-        double sizeA = (double) borderClusterA.getMembers().size();
-        double sizeB = (double) borderClusterB.getMembers().size();
+        int countA = countInterconnection(borderClusterA);
+        int countB = countInterconnection(borderClusterB);
 
-        return ((double) count) / ((sizeA + sizeB) / 2) >= this.mergeThreshold;
+        return ((double) count) / (((double) countA + (double) countB) / 2) >= this.mergeThreshold;
     }
 
     private Cluster merge(Cluster clusterA, Cluster clusterB) {
