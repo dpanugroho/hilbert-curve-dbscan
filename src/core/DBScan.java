@@ -1,20 +1,27 @@
 package core;
 
+import beans.Cluster;
 import beans.Point;
 import util.MathUtil;
 
 import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 
 // TODO: Write docs
 public class DBScan {
-    Point[] D;
+    private Point[] D;
+    private List<Cluster> clusters;
     private double eps;
     private int minPts;
+    private String uuid;
 
     public DBScan(Point[] D, double eps, int minPts) {
         this.D = D;
+        this.clusters = new ArrayList<>();
         this.eps = eps;
         this.minPts = minPts;
+        this.uuid = String.valueOf(UUID.randomUUID());
     }
 
     /**
@@ -22,8 +29,7 @@ public class DBScan {
      *
      * @return labels for each points
      */
-    public Point[] Scan() {
-        // c is ID if current cluster
+    public List<Cluster> Scan() {
         int c = 0;
 
         // Go through all points in dataset
@@ -31,16 +37,31 @@ public class DBScan {
             if (!p.isVisited()) {
                 ArrayList<Point> neighborPts = regionQuery(p, this.eps);
                 if (neighborPts.size() < this.minPts) {
+                    // An outlier is a cluster with only 1 member
+                    c++;
                     p.setVisited(true);
+                    String outlierId = uuid + "_" + String.valueOf(c);
+                    p.setLabel(outlierId);
+                    Cluster cluster = new Cluster();
+                    cluster.setLabel(outlierId);
+                    cluster.add(p);
+                    this.clusters.add(cluster);
                 } else {
-                    c++; // change to the next cluster
+                    // change to the next cluster with unix timestamp as its name
+                    c++;
+                    String outlierId = uuid + "_" + String.valueOf(c);
                     // a point is a core point if it has more than a specified number of points (MinPts) within Eps
                     p.setCore(true);
-                    neighborPts.addAll(expandCluster(p, neighborPts, c, this.eps, this.minPts));
+                    p.setLabel(outlierId);
+                    Cluster cluster = new Cluster();
+                    cluster.setLabel(outlierId);
+                    cluster.add(p);
+                    neighborPts.addAll(expandCluster(p, neighborPts, cluster, this.eps, this.minPts));
                 }
             }
         }
-        return this.D;
+
+        return this.clusters;
     }
 
     /**
@@ -48,13 +69,13 @@ public class DBScan {
      *
      * @param p           a point
      * @param neighborPts neighbor points of p
-     * @param c           cluster id
+     * @param c   cluster id
      * @param eps         epsion value
      * @param minPts      minimum number of neighbors for a point to be considered as a cluster
      */
-    private ArrayList<Point> expandCluster(Point p, ArrayList<Point> neighborPts, int c, double eps, double minPts) {
+    private ArrayList<Point> expandCluster(Point p, ArrayList<Point> neighborPts, Cluster c, double eps, double minPts) {
         p.setVisited(true); // mark p as visited
-        p.setLabel(c); // add p to cluster c
+        p.setLabel(c.getLabel()); // add p to cluster with id clusterId
 
         for (int i = 0; i < neighborPts.size(); i++) {
             Point Pn = neighborPts.get(i);
@@ -66,10 +87,13 @@ public class DBScan {
                     neighborPts.addAll(PnNeighborPts);
                 }
             }
-            if (Pn.getLabel() < 1) { // if P' is not yet member of any cluster
-                Pn.setLabel(c); // add P' to cluster c
+            if (Pn.getLabel().equals("")) { // if P' is not yet member of any cluster
+                Pn.setLabel(c.getLabel()); // add P' to cluster c
+                c.add(Pn);
             }
         }
+
+        this.clusters.add(c);
 
         return neighborPts;
     }
