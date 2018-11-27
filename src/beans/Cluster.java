@@ -19,10 +19,6 @@ public class Cluster {
         return members;
     }
 
-    public void setMembers(List<Point> members) {
-        this.members = members;
-    }
-
     public String getLabel() {
         return label;
     }
