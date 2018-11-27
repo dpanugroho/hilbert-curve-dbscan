@@ -1,3 +1,4 @@
+import beans.Cluster;
 import beans.Point;
 import core.Clarans;
 import core.DBScan;
@@ -88,10 +89,10 @@ public class Main {
         Clarans clarans = new Clarans(datasetInPoint, threshold, initialMedoid);
         List<Point[]> labels = clarans.assign(10);
 
-        List<Point[]> dbScanResult = new ArrayList<>();
+        List<Cluster> dbScanResult = new ArrayList<>();
         labels.parallelStream().forEach((label) -> {
             DBScan scan = new DBScan(label, 0.5, 5);
-            dbScanResult.add(scan.Scan());
+            dbScanResult.addAll(scan.Scan());
         });
     }
 }
