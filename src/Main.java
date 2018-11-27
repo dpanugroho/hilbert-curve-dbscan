@@ -1,11 +1,13 @@
 import beans.Point;
 import core.Clarans;
+import core.Merge;
 import util.InputReader;
 import util.MathUtil;
 import hilbert.HilbertProcess;
 
 import java.io.FileNotFoundException;
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.List;
 
 public class Main {
@@ -107,6 +109,8 @@ public class Main {
 
 
         // TODO: Run DBScan for each partition genrated by CLarans
+        Merge merge = new Merge(new ArrayList<>(), 1, 0.1);
+        merge.mergeAll();
 
     }
 }
