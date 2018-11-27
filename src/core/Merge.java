@@ -77,13 +77,22 @@ public class Merge {
         return ((double) count) / (((double) countA + (double) countB) / 2) >= this.mergeThreshold;
     }
 
-    private Cluster merge(Cluster clusterA, Cluster clusterB) {
-        for (Point p : clusterB.getMembers()) {
-            clusterA.add(p);
-            // TODO: Set points' label to cluster A's label
+    /**
+     * Merge list of clusters into one, doesn't care if it can be merged or not
+     * @param clusters
+     * @return merged clusters
+     */
+    private List<Cluster> merge(List<Cluster> clusters) {
+        // TODO: Check if list of clusters is 0 or not
+        Cluster firstCluster = clusters.get(0);
+        for (Cluster cluster: clusters) {
+            cluster.setLabel(firstCluster.getLabel()); // Merging means setting all labels to the same label, e.g: firstCluster's label
+            for (Point p: cluster.getMembers()) {
+                p.setLabel(firstCluster.getLabel()); // Merging means setting all points in this cluster to the same label. e.g: firstCluster's label
+            }
         }
 
-        return clusterA;
+        return clusters; // Return modified list of clusters back
     }
 
     public List<Cluster> mergeAll() {
