@@ -1,6 +1,7 @@
 import beans.Cluster;
 import beans.Point;
 import core.Clarans;
+import core.ClusterMerger;
 import core.DBScan;
 import util.InputReader;
 import util.MathUtil;
@@ -9,7 +10,9 @@ import hilbert.HilbertProcess;
 import java.io.FileNotFoundException;
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class Main {
 
@@ -87,12 +90,19 @@ public class Main {
 
         // Run CLARANS on dataset, and get list of cluster
         Clarans clarans = new Clarans(datasetInPoint, threshold, initialMedoid);
-        List<Point[]> labels = clarans.assign(10);
+        List<Point[]> partitions = clarans.assign(1000);
 
+
+        double EPS = 0.001;
         List<Cluster> dbScanResult = new ArrayList<>();
-        labels.parallelStream().forEach((label) -> {
-            DBScan scan = new DBScan(label, 0.5, 5);
-            dbScanResult.addAll(scan.Scan());
+        partitions.parallelStream().forEach((partition) -> {
+            DBScan scan = new DBScan(partition, EPS, 3);
+            List<Cluster> currentResult = scan.Scan();
+            dbScanResult.addAll(currentResult);
         });
+
+        // TODO: Analyze & perform tests
+        ClusterMerger mClusterMerger = new ClusterMerger(dbScanResult, 0.6, EPS);
+        List<Cluster> mFinalCluster = mClusterMerger.mergeAll();
     }
 }
