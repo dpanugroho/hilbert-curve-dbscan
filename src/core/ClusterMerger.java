@@ -24,9 +24,6 @@ public class ClusterMerger {
 
     private int getInterconnectivityCount(Cluster cluster) {
         int interconnectivityCount = 0;
-        if (cluster == null) {
-            System.out.print("FUCK");
-        }
         for (int i = 0; i < cluster.getMembers().size(); i++) {
             for (int j = i + 1; j < cluster.getMembers().size(); j++) {
                 Point pointA = cluster.getMembers().get(i);
