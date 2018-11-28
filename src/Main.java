@@ -97,7 +97,7 @@ public class Main {
         startTime = System.nanoTime();
         System.out.println("Run CLARANS Elapsed time: " + String.valueOf(elapsedTime));
 
-        double EPS = 10;
+        double EPS = 0.65;
         List<Cluster> dbScanResult = new ArrayList<>();
 
         // Parallel
@@ -115,7 +115,7 @@ public class Main {
 
         startTime = System.nanoTime();
         // TODO: Analyze & perform tests
-        ClusterMerger clusterMerger = new ClusterMerger(finalDbScanResult, 0.05, EPS);
+        ClusterMerger clusterMerger = new ClusterMerger(finalDbScanResult, 0.1, EPS);
         List<Cluster> finalClusters = clusterMerger.mergeAll();
         
         elapsedTime = (System.nanoTime() - startTime);

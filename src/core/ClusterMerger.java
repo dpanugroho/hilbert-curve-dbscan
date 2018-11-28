@@ -89,8 +89,8 @@ public class ClusterMerger {
         // Transform mergability map to mergability group
         List<List<Cluster>> mergabilityGroup = new ArrayList<>();
         // Loop over key
-        List<Cluster> currentGroup = new ArrayList<>();
         for (Cluster key : mergabilityMap.keySet()) {
+            List<Cluster> currentGroup = new ArrayList<>();
             currentGroup.addAll(mergabilityMap.get(key));
             for (Cluster val : mergabilityMap.get(key)) {
                 List<Cluster> itemAtVal = mergabilityMap.get(val);
@@ -105,27 +105,8 @@ public class ClusterMerger {
             currentGroup.clear();
             currentGroup.addAll(tmpClusterSet);
             Collections.sort(currentGroup, Comparator.comparing(Cluster::getLabel));
-            // TODO: Need to check if [A,B] contains in [[B,A],[C]]
-//            List<String> one = new ArrayList<>();
-//            one.add("A");
-//            one.add("B");
-//            Collections.sort(one);
-//            List<String> two = new ArrayList<>();
-//            two.add("B");
-//            two.add("A");
-//            Collections.sort(two);
-//            List<String> three = new ArrayList<>();
-//            three.add("C");
-//            Collections.sort(three);
-//            List<List<String>> x = new ArrayList<>();
-//            x.add(one);
-//            List<List<String>> y = new ArrayList<>();
-//            y.add(two);
-//            y.add(three);
-//
-//            boolean check = y.contains(one);
-
-            if(!mergabilityGroup.contains(currentGroup)){
+            boolean isMegabilityGroupContainCurrentGroup = mergabilityGroup.contains(currentGroup);
+            if(!isMegabilityGroupContainCurrentGroup){
                 mergabilityGroup.add(currentGroup);
             }
         }
