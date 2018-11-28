@@ -9,16 +9,12 @@ import hilbert.HilbertProcess;
 
 import java.io.FileNotFoundException;
 import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class Main {
 
     public static void main(String[] args) {
-//        long startTime = System.nanoTime();
-
         // Store dataset into 2D array of double
         double[][] dataFrameInDouble = new double[0][0];
         long[][] dataFrameHilbert;
@@ -31,13 +27,13 @@ public class Main {
             for (int i = 0; i < dataFrame.length; i++) {
                 for (int j = 0; j < dataFrame[i].length; j++) {
                     dataFrameInDouble[i][j] = Double.valueOf(dataFrame[i][j]);
-                    System.out.print(dataFrameInDouble[i][j] + "\t\t");
                 }
-                System.out.println();
             }
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
+
+        long startTime = System.nanoTime();
 
         int dimensions = dataFrameInDouble[0].length; // Dimension of the dataset
         int bits = 2; // Bits of the Hilbert Curve
@@ -95,16 +91,60 @@ public class Main {
 
         double EPS = 10;
         List<Cluster> dbScanResult = new ArrayList<>();
+
+        // Parallel
         partitions.parallelStream().forEach((partition) -> {
             DBScan scan = new DBScan(partition, EPS, 3);
             List<Cluster> currentResult = scan.Scan();
             dbScanResult.addAll(currentResult);
         });
 
+        // TODO: Look up for why some of the clusters are null
+        List<Cluster> finalDbScanResult = dbScanResult.stream().filter(Objects::nonNull).collect(Collectors.toList());
+
         // TODO: Analyze & perform tests
-        ClusterMerger clusterMerger = new ClusterMerger(dbScanResult, 0.05, EPS);
+        ClusterMerger clusterMerger = new ClusterMerger(finalDbScanResult, 0.05, EPS);
         List<Cluster> finalClusters = clusterMerger.mergeAll();
 
-        System.out.println("bla");
+        System.out.println("DBScan with Hilbert Curve and Paralleled");
+
+        int pointCount = 0;
+        for (Cluster cluster: finalClusters) {
+            for (Point point: cluster.getMembers()) {
+                System.out.print(pointCount + " ");
+                System.out.println(point.toString());
+                pointCount++;
+            }
+        }
+
+        long elapsedTime = (System.nanoTime() - startTime);
+        System.out.println("Elapsed time: " + String.valueOf(elapsedTime));
+
+        Point[] points = new Point[dataFrameInDouble.length];
+
+        for (int i = 0; i < dataFrameInDouble.length; i++) {
+            Point point = new Point(dataFrameInDouble[i]);
+            points[i] = point;
+        }
+
+        System.out.println("DBScan");
+
+        startTime = System.nanoTime();
+
+        DBScan scan = new DBScan(points, EPS, 3);
+        List<Cluster> withoutParallel = scan.Scan();
+
+        pointCount = 0;
+
+        for (Cluster cluster: withoutParallel) {
+            for (Point point: cluster.getMembers()) {
+                System.out.print(pointCount + " ");
+                System.out.println(point.toString());
+                pointCount++;
+            }
+        }
+
+        elapsedTime = (System.nanoTime() - startTime);
+        System.out.println("Elapsed time: " + String.valueOf(elapsedTime));
     }
 }
