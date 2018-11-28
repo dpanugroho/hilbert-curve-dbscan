@@ -90,10 +90,10 @@ public class Main {
 
         // Run CLARANS on dataset, and get list of cluster
         Clarans clarans = new Clarans(datasetInPoint, threshold, initialMedoid);
-        List<Point[]> partitions = clarans.assign(1000);
+        List<Point[]> partitions = clarans.assign(10);
 
 
-        double EPS = 0.001;
+        double EPS = 10;
         List<Cluster> dbScanResult = new ArrayList<>();
         partitions.parallelStream().forEach((partition) -> {
             DBScan scan = new DBScan(partition, EPS, 3);
@@ -102,7 +102,9 @@ public class Main {
         });
 
         // TODO: Analyze & perform tests
-        ClusterMerger mClusterMerger = new ClusterMerger(dbScanResult, 0.6, EPS);
-        List<Cluster> mFinalCluster = mClusterMerger.mergeAll();
+        ClusterMerger clusterMerger = new ClusterMerger(dbScanResult, 0.05, EPS);
+        List<Cluster> finalClusters = clusterMerger.mergeAll();
+
+        System.out.println("bla");
     }
 }

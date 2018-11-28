@@ -64,15 +64,15 @@ public class ClusterMerger {
             // get number of edges in A
             int nA = this.getInterconnectivityCount(clusterA);
             for (int j = i + 1; j < this.clustersToMerge.size(); j++) {
-                Cluster clusterB = this.clustersToMerge.get(i);
+                Cluster clusterB = this.clustersToMerge.get(j);
                 // get number of edges in B
-                int nB = this.getInterconnectivityCount(clusterB);
+                double nB = (double) this.getInterconnectivityCount(clusterB);
                 // get number of edges in AB
-                int nAB = this.getInterconnectivityCount(clusterA, clusterB);
+                double nAB = (double) this.getInterconnectivityCount(clusterA, clusterB);
 
-                double relativeInterconnectivity = nAB / 0.5 * (nA + nB);
+                double relativeInterconnectivity = nAB / (0.5 * (nA + nB));
                 // TODO: Should split with "-" and take first element to compare whether they are come from equal cluster
-                if (relativeInterconnectivity > this.mergingThreshold && !clusterA.getLabel().equals(clusterB.getLabel())) {
+                if (relativeInterconnectivity > this.mergingThreshold && !clusterA.getLabel().split("_")[0].equals(clusterB.getLabel().split("_")[0])) {
                     List<Cluster> tmp = new ArrayList<>();
                     // Check if we already have clusterA as a key by looking it up in the map
                     if (mergabilityMap.get(clusterA) != null) {
@@ -93,7 +93,10 @@ public class ClusterMerger {
         for (Cluster key : mergabilityMap.keySet()) {
             currentGroup.addAll(mergabilityMap.get(key));
             for (Cluster val : mergabilityMap.get(key)) {
-                currentGroup.addAll(mergabilityMap.get(val));
+                List<Cluster> itemAtVal = mergabilityMap.get(val);
+                if (itemAtVal != null) {
+                    currentGroup.addAll(mergabilityMap.get(val));
+                }
             }
 
             // remove duplicate
@@ -126,12 +129,13 @@ public class ClusterMerger {
 
     // TODO: Test
     public List<Cluster> mergeAll(){
-        List<Cluster> res = new ArrayList<>();
+        List<Cluster> finalClusters = new ArrayList<>();
 
         List<List<Cluster>> clusterGroup = getMergableClusters();
         for (List<Cluster> group: clusterGroup){
-            res.add(mergeClusterGroup(group));
+            finalClusters.add(mergeClusterGroup(group));
         }
-        return res;
+
+        return finalClusters;
     }
 }
