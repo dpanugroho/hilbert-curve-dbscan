@@ -84,10 +84,17 @@ public class Main {
         List<Integer> initialMedoid = hilbertProcess.getMedoidPointIndexList(hilbertProcess
                 .clusterAdjacentCell(numberOfCellPoints), indexOfCoordinates);
 
+        long elapsedTime = (System.nanoTime() - startTime);
+        startTime = System.nanoTime();
+        System.out.println("Finding initial medoids Elapsed time: " + String.valueOf(elapsedTime));
+
         // Run CLARANS on dataset, and get list of cluster
         Clarans clarans = new Clarans(datasetInPoint, threshold, initialMedoid);
         List<Point[]> partitions = clarans.assign(10);
 
+        elapsedTime = (System.nanoTime() - startTime);
+        startTime = System.nanoTime();
+        System.out.println("Run CLARANS Elapsed time: " + String.valueOf(elapsedTime));
 
         double EPS = 10;
         List<Cluster> dbScanResult = new ArrayList<>();
@@ -117,8 +124,8 @@ public class Main {
             }
         }
 
-        long elapsedTime = (System.nanoTime() - startTime);
-        System.out.println("Elapsed time: " + String.valueOf(elapsedTime));
+        elapsedTime = (System.nanoTime() - startTime);
+        System.out.println("Merging Partitions - Elapsed time: " + String.valueOf(elapsedTime));
 
         Point[] points = new Point[dataFrameInDouble.length];
 
