@@ -22,7 +22,7 @@ public class Main {
         // Reading input csv
         InputReader inputReader = new InputReader();
         try {
-            String[][] dataFrame = inputReader.readCsv("iris.data.txt");
+            String[][] dataFrame = inputReader.readCsv("../iris.data.txt");
             dataFrameInDouble = new double[dataFrame.length][dataFrame[0].length];
             for (int i = 0; i < dataFrame.length; i++) {
                 for (int j = 0; j < dataFrame[i].length; j++) {
@@ -122,13 +122,13 @@ public class Main {
         System.out.println("Merging Partitions - Elapsed time: " + String.valueOf(elapsedTime));
         System.out.println("totalTime" + String.valueOf(System.nanoTime() -total_startTime));
 
-        System.out.println("DBScan with Hilbert Curve and Paralleled");
+        System.out.println("\nDBScan with Hilbert Curve and Paralleled");
 
         int pointCount = 0;
         for (Cluster cluster: finalClusters) {
+            System.out.println("Cluster "+cluster.getLabel());
             for (Point point: cluster.getMembers()) {
-                System.out.print(pointCount + " ");
-                System.out.println(point.toString());
+                System.out.println(" |- "+point.toString());
                 pointCount++;
             }
         }
@@ -140,7 +140,7 @@ public class Main {
             points[i] = point;
         }
 
-        System.out.println("DBScan");
+        System.out.println("\nDBScan");
 
         startTime = System.nanoTime();
 
@@ -150,9 +150,9 @@ public class Main {
         pointCount = 0;
 
         for (Cluster cluster: withoutParallel) {
+            System.out.println("Cluster "+cluster.getLabel());
             for (Point point: cluster.getMembers()) {
-                System.out.print(pointCount + " ");
-                System.out.println(point.toString());
+                System.out.println(" |- "+point.toString());
                 pointCount++;
             }
         }
