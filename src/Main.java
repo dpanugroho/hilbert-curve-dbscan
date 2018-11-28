@@ -34,6 +34,7 @@ public class Main {
         }
 
         long startTime = System.nanoTime();
+        long total_startTime = System.nanoTime();
 
         int dimensions = dataFrameInDouble[0].length; // Dimension of the dataset
         int bits = 2; // Bits of the Hilbert Curve
@@ -105,13 +106,21 @@ public class Main {
             List<Cluster> currentResult = scan.Scan();
             dbScanResult.addAll(currentResult);
         });
+        
+        elapsedTime = (System.nanoTime() - startTime);
+        System.out.println("Run DBSCAN Parallel Elapsed time: " + String.valueOf(elapsedTime));
 
         // TODO: Look up for why some of the clusters are null
         List<Cluster> finalDbScanResult = dbScanResult.stream().filter(Objects::nonNull).collect(Collectors.toList());
 
+        startTime = System.nanoTime();
         // TODO: Analyze & perform tests
         ClusterMerger clusterMerger = new ClusterMerger(finalDbScanResult, 0.05, EPS);
         List<Cluster> finalClusters = clusterMerger.mergeAll();
+        
+        elapsedTime = (System.nanoTime() - startTime);
+        System.out.println("Merging Partitions - Elapsed time: " + String.valueOf(elapsedTime));
+        System.out.println("totalTime" + String.valueOf(System.nanoTime() -total_startTime));
 
         System.out.println("DBScan with Hilbert Curve and Paralleled");
 
@@ -123,10 +132,7 @@ public class Main {
                 pointCount++;
             }
         }
-
-        elapsedTime = (System.nanoTime() - startTime);
-        System.out.println("Merging Partitions - Elapsed time: " + String.valueOf(elapsedTime));
-
+        
         Point[] points = new Point[dataFrameInDouble.length];
 
         for (int i = 0; i < dataFrameInDouble.length; i++) {
