@@ -39,6 +39,15 @@ public class Point {
         isVisited = visited;
     }
 
+    @Override
+    public String toString() {
+        String coordinate = "";
+        for (int i = 0; i < this.coordinates.length; i++) {
+            coordinate += this.coordinates[i] + ",";
+        }
+        return coordinate;
+    }
+
     public String getLabel() {
         return label;
     }

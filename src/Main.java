@@ -1,6 +1,7 @@
 import beans.Cluster;
 import beans.Point;
 import core.Clarans;
+import core.ClusterMerger;
 import core.DBScan;
 import util.InputReader;
 import util.MathUtil;
@@ -8,14 +9,12 @@ import hilbert.HilbertProcess;
 
 import java.io.FileNotFoundException;
 import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class Main {
 
     public static void main(String[] args) {
-//        long startTime = System.nanoTime();
-
         // Store dataset into 2D array of double
         double[][] dataFrameInDouble = new double[0][0];
         long[][] dataFrameHilbert;
@@ -28,13 +27,14 @@ public class Main {
             for (int i = 0; i < dataFrame.length; i++) {
                 for (int j = 0; j < dataFrame[i].length; j++) {
                     dataFrameInDouble[i][j] = Double.valueOf(dataFrame[i][j]);
-                    System.out.print(dataFrameInDouble[i][j] + "\t\t");
                 }
-                System.out.println();
             }
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
+
+        long startTime = System.nanoTime();
+        long total_startTime = System.nanoTime();
 
         int dimensions = dataFrameInDouble[0].length; // Dimension of the dataset
         int bits = 2; // Bits of the Hilbert Curve
@@ -85,14 +85,79 @@ public class Main {
         List<Integer> initialMedoid = hilbertProcess.getMedoidPointIndexList(hilbertProcess
                 .clusterAdjacentCell(numberOfCellPoints), indexOfCoordinates);
 
+        long elapsedTime = (System.nanoTime() - startTime);
+        startTime = System.nanoTime();
+        System.out.println("Finding initial medoids Elapsed time: " + String.valueOf(elapsedTime));
+
         // Run CLARANS on dataset, and get list of cluster
         Clarans clarans = new Clarans(datasetInPoint, threshold, initialMedoid);
-        List<Point[]> labels = clarans.assign(10);
+        List<Point[]> partitions = clarans.assign(10);
 
+        elapsedTime = (System.nanoTime() - startTime);
+        startTime = System.nanoTime();
+        System.out.println("Run CLARANS Elapsed time: " + String.valueOf(elapsedTime));
+
+        double EPS = 0.65;
         List<Cluster> dbScanResult = new ArrayList<>();
-        labels.parallelStream().forEach((label) -> {
-            DBScan scan = new DBScan(label, 0.5, 5);
-            dbScanResult.addAll(scan.Scan());
+
+        // Parallel
+        partitions.parallelStream().forEach((partition) -> {
+            DBScan scan = new DBScan(partition, EPS, 3);
+            List<Cluster> currentResult = scan.Scan();
+            dbScanResult.addAll(currentResult);
         });
+        
+        elapsedTime = (System.nanoTime() - startTime);
+        System.out.println("Run DBSCAN Parallel Elapsed time: " + String.valueOf(elapsedTime));
+
+        // TODO: Look up for why some of the clusters are null
+        List<Cluster> finalDbScanResult = dbScanResult.stream().filter(Objects::nonNull).collect(Collectors.toList());
+
+        startTime = System.nanoTime();
+        // TODO: Analyze & perform tests
+        ClusterMerger clusterMerger = new ClusterMerger(finalDbScanResult, 0.1, EPS);
+        List<Cluster> finalClusters = clusterMerger.mergeAll();
+        
+        elapsedTime = (System.nanoTime() - startTime);
+        System.out.println("Merging Partitions - Elapsed time: " + String.valueOf(elapsedTime));
+        System.out.println("totalTime" + String.valueOf(System.nanoTime() -total_startTime));
+
+        System.out.println("DBScan with Hilbert Curve and Paralleled");
+
+        int pointCount = 0;
+        for (Cluster cluster: finalClusters) {
+            for (Point point: cluster.getMembers()) {
+                System.out.print(pointCount + " ");
+                System.out.println(point.toString());
+                pointCount++;
+            }
+        }
+        
+        Point[] points = new Point[dataFrameInDouble.length];
+
+        for (int i = 0; i < dataFrameInDouble.length; i++) {
+            Point point = new Point(dataFrameInDouble[i]);
+            points[i] = point;
+        }
+
+        System.out.println("DBScan");
+
+        startTime = System.nanoTime();
+
+        DBScan scan = new DBScan(points, EPS, 3);
+        List<Cluster> withoutParallel = scan.Scan();
+
+        pointCount = 0;
+
+        for (Cluster cluster: withoutParallel) {
+            for (Point point: cluster.getMembers()) {
+                System.out.print(pointCount + " ");
+                System.out.println(point.toString());
+                pointCount++;
+            }
+        }
+
+        elapsedTime = (System.nanoTime() - startTime);
+        System.out.println("Elapsed time: " + String.valueOf(elapsedTime));
     }
 }
