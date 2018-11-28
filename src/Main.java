@@ -15,6 +15,28 @@ import java.util.stream.Collectors;
 public class Main {
 
     public static void main(String[] args) {
+        String filePath = "../iris.data.txt";
+        double EPS = 0.65;
+        int minPts = 3;
+        double mergingThreshold = 0.1;
+
+        // If first argument (filePath) was filled in by user
+        if (args.length >= 1) {
+            filePath = args[0];
+        }
+
+        if (args.length >= 2) {
+            EPS = Double.valueOf(args[1]);
+        }
+
+        if (args.length >= 3) {
+            minPts = Integer.valueOf(args[2]);
+        }
+
+        if (args.length >= 4) {
+            mergingThreshold = Double.valueOf(args[3]);
+        }
+
         // Store dataset into 2D array of double
         double[][] dataFrameInDouble = new double[0][0];
         long[][] dataFrameHilbert;
@@ -22,7 +44,7 @@ public class Main {
         // Reading input csv
         InputReader inputReader = new InputReader();
         try {
-            String[][] dataFrame = inputReader.readCsv("../iris.data.txt");
+            String[][] dataFrame = inputReader.readCsv(filePath);
             dataFrameInDouble = new double[dataFrame.length][dataFrame[0].length];
             for (int i = 0; i < dataFrame.length; i++) {
                 for (int j = 0; j < dataFrame[i].length; j++) {
@@ -97,12 +119,14 @@ public class Main {
         startTime = System.nanoTime();
         System.out.println("Run CLARANS Elapsed time: " + String.valueOf(elapsedTime));
 
-        double EPS = 0.65;
         List<Cluster> dbScanResult = new ArrayList<>();
+
+        final double epsilon = EPS; // Hacky way because only final variable can be used inside lambda expression
+        final int minimumPoints = minPts;
 
         // Parallel
         partitions.parallelStream().forEach((partition) -> {
-            DBScan scan = new DBScan(partition, EPS, 3);
+            DBScan scan = new DBScan(partition, epsilon, minimumPoints);
             List<Cluster> currentResult = scan.Scan();
             dbScanResult.addAll(currentResult);
         });
@@ -115,7 +139,7 @@ public class Main {
 
         startTime = System.nanoTime();
         // TODO: Analyze & perform tests
-        ClusterMerger clusterMerger = new ClusterMerger(finalDbScanResult, 0.1, EPS);
+        ClusterMerger clusterMerger = new ClusterMerger(finalDbScanResult, mergingThreshold, EPS);
         List<Cluster> finalClusters = clusterMerger.mergeAll();
         
         elapsedTime = (System.nanoTime() - startTime);
